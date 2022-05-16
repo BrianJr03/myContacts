@@ -19,6 +19,7 @@ A simple contacts app that allows a user to load their stored contacts to be dis
     
 - Phone Calls / SMS
   - After clicking on a contact card, the user can reach the contact either via direct phone call or SMS.
+  - If there are no maching contacts after search, a user can Call or SMS the query if it's a phone number.
   
 - Clean Architecture
   - The source code for this project is cleanly written and follows best practices.
