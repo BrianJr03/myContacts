@@ -40,7 +40,7 @@ class DialogPlus {
             TextButton(
               onPressed: onSubmitTap,
               child: Text(submitText,
-                  style:  TextStyle(color: ColorsPlus.secondaryColor)),
+                  style: TextStyle(color: ColorsPlus.secondaryColor)),
             ),
         ],
       ),
@@ -101,10 +101,10 @@ class DialogPlus {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xff53a99a)),
-          children: const [
+          children: [
             TextSpan(
-                text: '?',
-                style: TextStyle(
+                text: '\n@ ${contact['phone'].toString()}',
+                style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black))
