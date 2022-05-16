@@ -176,7 +176,9 @@ class _ContactsPageState extends State<ContactsPage> {
     if (query.isNotEmpty) {
       List<Map> queriedContacts = [];
       for (var contact in _contacts) {
-        if (contact['name'].toLowerCase().startsWith(query.toLowerCase())) {
+        if (contact['name'].toLowerCase().contains(query.toLowerCase())) {
+          queriedContacts.add(contact);
+        } else if (contact['phone'].toString().contains(query)) {
           queriedContacts.add(contact);
         }
       }
@@ -224,7 +226,7 @@ class _ContactsPageState extends State<ContactsPage> {
                   cursorColor: ColorsPlus.primaryColor,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Search Contacts",
+                    hintText: "Search Contacts | Enter Phone",
                     hintStyle: TextStyle(color: ColorsPlus.primaryColor),
                     suffixIcon:
                         Icon(Icons.search, color: ColorsPlus.primaryColor),
