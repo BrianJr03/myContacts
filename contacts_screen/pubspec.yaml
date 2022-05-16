@@ -71,6 +71,7 @@ flutter:
   assets:
     - assets/my_pfp.jpg
     - assets/google-contacts.png
+    - assets/place_holder.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
@@ -15,7 +16,6 @@ class _ContactsPageState extends State<ContactsPage> {
       TextStyle(fontSize: 15, color: Colors.grey[600]);
 
   final List<Map> _contacts = [];
-  final List<String> _contactNames = [];
 
   @override
   void initState() {
@@ -29,8 +29,11 @@ class _ContactsPageState extends State<ContactsPage> {
           withPhoto: true, withProperties: true);
       setState(() {
         for (var contact in contacts) {
-          _contactNames.add("${contact.name.first} ${contact.name.last}");
-          _contacts.add({"name": "${contact.name.first} ${contact.name.last}"});
+          _contacts.add({
+            "name": "${contact.name.first} ${contact.name.last}",
+            "photo": contact.photoOrThumbnail,
+            "phone": contact.phones[0].normalizedNumber
+          });
         }
       });
     }
@@ -68,6 +71,31 @@ class _ContactsPageState extends State<ContactsPage> {
         ]),
       );
 
+  InkWell _contactCard(Map contact) {
+    ImageProvider<Object> imageProvider =
+        const AssetImage('assets/place_holder.png');
+    if (contact['photo'] != null) {
+      imageProvider = MemoryImage(contact['photo']);
+    }
+    return InkWell(
+      onTap: (() => _makeCall(contact['phone'])),
+      child: Card(
+        elevation: 5.0,
+        margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+        child: ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          leading: CircleAvatar(
+            radius: 15,
+            backgroundImage: imageProvider,
+          ),
+          title: Text(contact['name'].toString().trim()),
+          trailing: const Icon(Icons.call, color: Color(0xff53a99a)),
+        ),
+      ),
+    );
+  }
+
   SliverList get _noImportedContactsMSG => SliverList(
           delegate: SliverChildListDelegate([
         const SizedBox(height: 10),
@@ -104,43 +132,40 @@ class _ContactsPageState extends State<ContactsPage> {
         ),
       ),
       itemBuilder: (context, contact) {
-        return Card(
-          elevation: 5.0,
-          margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-          child: ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            leading: const Icon(Icons.account_circle, size: 30),
-            title: Text(contact['name'].toString().trim()),
-            trailing: const Icon(Icons.call, color: Color(0xff53a99a)),
-          ),
-        );
+        return _contactCard(contact);
       },
     );
   }
 
   void _filterSearchResults(String query) {
     if (query.isNotEmpty) {
-      List<String> queriedNames = [];
-      for (var name in _contactNames) {
-        if (name.toLowerCase().startsWith(query.toLowerCase())) {
-          queriedNames.add(name);
+      List<Map> queriedContacts = [];
+      for (var contact in _contacts) {
+        if (contact['name'].toLowerCase().startsWith(query.toLowerCase())) {
+          queriedContacts.add(contact);
         }
       }
       setState(() {
         _contacts.clear();
-        for (var name in queriedNames) {
-          _contacts.add({"name": name});
+        for (var contact in queriedContacts) {
+          _contacts.add({
+            "name": contact['name'],
+            "photo": contact['photo'],
+            "phone": contact['phone']
+          });
         }
       });
       return;
     } else {
       setState(() {
         _contacts.clear();
-        _contactNames.clear();
         _getContacts();
       });
     }
+  }
+
+  void _makeCall(String contactNumber) {
+    launchUrlString("tel://$contactNumber");
   }
 
   @override
@@ -149,31 +174,34 @@ class _ContactsPageState extends State<ContactsPage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
           body: Center(
-              child: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-              backgroundColor: const Color(0xff53a99a),
-              floating: true,
-              leading: const Icon(Icons.contacts),
-              title: TextField(
-                style: const TextStyle(color: Colors.white),
-                cursorColor: Colors.white,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Search Contacts",
-                  hintStyle: TextStyle(color: Colors.white),
-                  suffixIcon: Icon(Icons.search, color: Colors.white),
-                ),
-                onChanged: (value) {
-                  _filterSearchResults(value);
-                },
-              )),
-          _myContactCard,
-          _contacts.isNotEmpty
-              ? _contactList(_contacts)
-              : _noImportedContactsMSG
-        ],
-      ))),
+              child: _contacts.isNotEmpty
+                  ? CustomScrollView(
+                      slivers: [
+                        SliverAppBar(
+                            backgroundColor: const Color(0xff53a99a),
+                            floating: true,
+                            leading: const Icon(Icons.contacts),
+                            title: TextField(
+                              style: const TextStyle(color: Colors.white),
+                              cursorColor: Colors.white,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Search Contacts",
+                                hintStyle: TextStyle(color: Colors.white),
+                                suffixIcon:
+                                    Icon(Icons.search, color: Colors.white),
+                              ),
+                              onChanged: (value) {
+                                _filterSearchResults(value);
+                              },
+                            )),
+                        _myContactCard,
+                        _contacts.isNotEmpty
+                            ? _contactList(_contacts)
+                            : _noImportedContactsMSG
+                      ],
+                    )
+                  : const CircularProgressIndicator())),
     );
   }
 }
