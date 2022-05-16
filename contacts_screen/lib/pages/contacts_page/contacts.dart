@@ -20,8 +20,8 @@ class _ContactsPageState extends State<ContactsPage> {
   TextStyle get _myNameStyle => const TextStyle(fontSize: 25);
   TextStyle get _myInfoStyle =>
       TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
-
   final List<Map> _contacts = [];
+  final _searchBarContr = TextEditingController();
 
   @override
   void initState() {
@@ -39,6 +39,7 @@ class _ContactsPageState extends State<ContactsPage> {
             "name": "${contact.name.first} ${contact.name.last}",
             "photo": contact.photoOrThumbnail,
             "phone": contact.phones[0].number,
+            "phoneNorm": contact.phones[0].normalizedNumber,
           });
         }
       });
@@ -89,26 +90,8 @@ class _ContactsPageState extends State<ContactsPage> {
           title: AutoSizeText.rich(DialogPlus.contactMethodText(contact)),
           content: Column(
             children: [
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {
-                    // Clears contact dialog
-                    Navigator.pop(context);
-                    _makeCall(contact['phone']);
-                  },
-                  child: Icon(Icons.call, color: ColorsPlus.primaryColor)),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {
-                    // Clears contact dialog
-                    Navigator.pop(context);
-                    _createSMS(contact['phone']);
-                  },
-                  child: Icon(Icons.sms, color: ColorsPlus.primaryColor))
+              _makeCallBTN(phoneNumber: contact['phone']),
+              _createSmsBTN(phoneNumber: contact['phone'])
             ],
           ),
           onSubmitTap: () => Navigator.pop(context),
@@ -131,13 +114,6 @@ class _ContactsPageState extends State<ContactsPage> {
       ),
     );
   }
-
-  SliverList get _noImportedContactsMSG => SliverList(
-          delegate: SliverChildListDelegate([
-        const SizedBox(height: 10),
-        const Center(
-            child: Text("No contacts to show.", style: TextStyle(fontSize: 20)))
-      ]));
 
   SliverGroupedListView _contactList(List<dynamic> contactList) {
     return SliverGroupedListView<dynamic, String>(
@@ -178,7 +154,7 @@ class _ContactsPageState extends State<ContactsPage> {
       for (var contact in _contacts) {
         if (contact['name'].toLowerCase().contains(query.toLowerCase())) {
           queriedContacts.add(contact);
-        } else if (contact['phone'].toString().contains(query)) {
+        } else if (contact['phoneNorm'].toString().contains(query)) {
           queriedContacts.add(contact);
         }
       }
@@ -189,6 +165,7 @@ class _ContactsPageState extends State<ContactsPage> {
             "name": contact['name'],
             "photo": contact['photo'],
             "phone": contact['phone'],
+            "phoneNorm": contact['phoneNorm'],
           });
         }
       });
@@ -199,6 +176,49 @@ class _ContactsPageState extends State<ContactsPage> {
         _getContacts();
       });
     }
+  }
+
+  SliverList _noMatchingContactsMSG({required String numToContact}) {
+    return SliverList(
+        delegate: SliverChildListDelegate([
+      const SizedBox(height: 10),
+      const Center(
+          child: Text("No contacts to show.", style: TextStyle(fontSize: 20))),
+      const SizedBox(height: 10),
+      if (int.tryParse(numToContact) != null)
+        Column(
+          children: [
+            _makeCallBTN(phoneNumber: numToContact),
+            _createSmsBTN(phoneNumber: numToContact)
+          ],
+        )
+    ]));
+  }
+
+  ElevatedButton _makeCallBTN({required String phoneNumber}) {
+    return ElevatedButton(
+        style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+        onPressed: () {
+          // Clears contact dialog
+          Navigator.pop(context);
+          _makeCall(phoneNumber);
+        },
+        child: Icon(Icons.call, color: ColorsPlus.primaryColor));
+  }
+
+  ElevatedButton _createSmsBTN({required String phoneNumber}) {
+    return ElevatedButton(
+        style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+        onPressed: () {
+          // Clears contact dialog
+          Navigator.pop(context);
+          _createSMS(phoneNumber);
+        },
+        child: Icon(Icons.sms, color: ColorsPlus.primaryColor));
   }
 
   void _makeCall(String contactNumber) async {
@@ -222,6 +242,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 floating: true,
                 leading: const Icon(Icons.contacts),
                 title: TextField(
+                  controller: _searchBarContr,
                   style: TextStyle(color: ColorsPlus.primaryColor),
                   cursorColor: ColorsPlus.primaryColor,
                   decoration: InputDecoration(
@@ -238,7 +259,7 @@ class _ContactsPageState extends State<ContactsPage> {
             _myContactCard,
             _contacts.isNotEmpty
                 ? _contactList(_contacts)
-                : _noImportedContactsMSG
+                : _noMatchingContactsMSG(numToContact: _searchBarContr.text)
           ],
         ))));
   }
