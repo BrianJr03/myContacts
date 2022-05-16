@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({Key? key}) : super(key: key);
@@ -9,30 +10,19 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  TextStyle get contactNameStyle => const TextStyle(fontSize: 25);
+  TextStyle get myNameStyle => const TextStyle(fontSize: 25);
+  TextStyle get myInfoStyle => TextStyle(fontSize: 15, color: Colors.grey[600]);
 
-  TextStyle get contactInfoStyle =>
-      TextStyle(fontSize: 15, color: Colors.grey[600]);
-
-  final List<String> contactNames = [];
-
-  final _contacts = [
-    {'name': '*'},
-    {'name': 'John'},
-    {'name': 'Will'},
-    {'name': 'Beth'},
-    {'name': 'Miranda'},
-    {'name': 'Mike'},
-    {'name': 'Danny'},
-  ];
+  final List<Map> _contacts = [];
+  final List<String> _contactNames = [];
 
   @override
   void initState() {
     super.initState();
-    _populateContactNames();
+    _getContacts();
   }
 
-  SliverList get myContactCard => SliverList(
+  SliverList get _myContactCard => SliverList(
         delegate: SliverChildListDelegate([
           SizedBox(
             height: 100,
@@ -52,10 +42,10 @@ class _ContactsPageState extends State<ContactsPage> {
                       children: [
                         Text(
                           "Brian Walker",
-                          style: contactNameStyle,
+                          style: myNameStyle,
                         ),
                         const SizedBox(height: 7),
-                        Text("Software Engineer", style: contactInfoStyle)
+                        Text("Software Engineer", style: myInfoStyle)
                       ])
                 ],
               ),
@@ -64,7 +54,7 @@ class _ContactsPageState extends State<ContactsPage> {
         ]),
       );
 
-  SliverGroupedListView myContacts(List<dynamic> contactList) {
+  SliverGroupedListView _contactList(List<dynamic> contactList) {
     return SliverGroupedListView<dynamic, String>(
       elements: contactList,
       groupBy: (contact) => contact['name'][0],
@@ -91,7 +81,7 @@ class _ContactsPageState extends State<ContactsPage> {
           ),
         ),
       ),
-      itemBuilder: (c, contact) {
+      itemBuilder: (context, contact) {
         return Card(
           elevation: 5.0,
           margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
@@ -99,26 +89,32 @@ class _ContactsPageState extends State<ContactsPage> {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
             leading: const Icon(Icons.account_circle, size: 30),
-            title: Text(contact['name']),
-            trailing: const Icon(Icons.arrow_forward),
+            title: Text(contact['name'].toString().trim()),
+            trailing: const Icon(Icons.call, color: Color(0xff53a99a)),
           ),
         );
       },
     );
   }
 
-  void _populateContactNames() {
-    for (var contact in _contacts) {
-      contactNames.add(contact['name']!);
+  void _getContacts() async {
+    if (await FlutterContacts.requestPermission()) {
+      List<Contact> contacts = await FlutterContacts.getContacts(
+          withPhoto: true, withProperties: true);
+      setState(() {
+        for (var contact in contacts) {
+          _contactNames.add("${contact.name.first} ${contact.name.last}");
+          _contacts.add({"name": "${contact.name.first} ${contact.name.last}"});
+        }
+      });
     }
   }
 
-  void filterSearchResults(String query) {
+  void _filterSearchResults(String query) {
     if (query.isNotEmpty) {
       List<String> queriedNames = [];
-
-      for (var name in contactNames) {
-        if (name.contains(query)) {
+      for (var name in _contactNames) {
+        if (name.toLowerCase().startsWith(query.toLowerCase())) {
           queriedNames.add(name);
         }
       }
@@ -132,15 +128,8 @@ class _ContactsPageState extends State<ContactsPage> {
     } else {
       setState(() {
         _contacts.clear();
-        _contacts.addAll([
-          {'name': '*'},
-          {'name': 'John'},
-          {'name': 'Will'},
-          {'name': 'Beth'},
-          {'name': 'Miranda'},
-          {'name': 'Mike'},
-          {'name': 'Danny'},
-        ]);
+        _contactNames.clear();
+        _getContacts();
       });
     }
   }
@@ -167,12 +156,11 @@ class _ContactsPageState extends State<ContactsPage> {
                   suffixIcon: Icon(Icons.search, color: Colors.white),
                 ),
                 onChanged: (value) {
-                  filterSearchResults(value);
+                  _filterSearchResults(value);
                 },
-                onSubmitted: (value) {},
               )),
-          myContactCard,
-          myContacts(_contacts)
+          _myContactCard,
+          _contactList(_contacts)
         ],
       ))),
     );

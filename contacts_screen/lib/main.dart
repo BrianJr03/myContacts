@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ContactsPage(),
+      home: const ContactsPage(),
       debugShowCheckedModeBanner: false,
     );
   }
