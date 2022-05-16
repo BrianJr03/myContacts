@@ -21,6 +21,11 @@ class _ContactsPageState extends State<ContactsPage> {
       TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
   final List<Map> _contacts = [];
   final _searchBarContr = TextEditingController();
+  final _myNameContr = TextEditingController();
+  final _myInfoContr = TextEditingController();
+
+  String _myNameStr = "My Name";
+  String _myInfoStr = "My Info";
 
   @override
   void initState() {
@@ -45,37 +50,88 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
-  SliverList get _myContactCard => SliverList(
-        delegate: SliverChildListDelegate([
-          SizedBox(
-            height: 100,
+  CircleAvatar _avatar({required double radius}) {
+    return CircleAvatar(
+      radius: radius,
+      backgroundImage: const AssetImage('assets/my_pfp.jpg'),
+    );
+  }
+
+  Column _myInfo() {
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Text(
+        _myNameStr,
+        style: _myNameStyle,
+      ),
+      const SizedBox(height: 7),
+      Text(_myInfoStr, style: _myInfoStyle)
+    ]);
+  }
+
+  SliverList _myContactCard() {
+    return SliverList(
+      delegate: SliverChildListDelegate([
+        SizedBox(
+          height: 100,
+          child: InkWell(
+            onTap: () {
+              DialogPlus.showDialogPlus(
+                  context: context,
+                  title: const Text(""),
+                  content: Column(
+                    children: [
+                      _avatar(radius: 50),
+                      const SizedBox(height: 20),
+                      _myInfo(),
+                      const SizedBox(height: 20),
+                      DialogPlus.dialogTextField(
+                        hintText: "Edit name",
+                        contr: _myNameContr,
+                      ),
+                      const SizedBox(height: 5),
+                      DialogPlus.dialogTextField(
+                        hintText: "Edit info",
+                        contr: _myInfoContr,
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  ColorsPlus.secondaryColor)),
+                          child: const Text("Change Photo"))
+                    ],
+                  ),
+                  onSubmitTap: () {
+                    setState(() {
+                      _myNameStr = _myNameContr.text.trim();
+                      _myInfoStr = _myInfoContr.text.trim();
+                    });
+                  },
+                  onCancelTap: () {},
+                  submitText: "Save",
+                  cancelText: "Cancel");
+            },
             child: Card(
               elevation: 5.0,
               shadowColor: ColorsPlus.secondaryColor,
               child: Row(
                 children: [
                   const SizedBox(width: 5),
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundImage: AssetImage('assets/my_pfp.jpg'),
-                  ),
+                  _avatar(radius: 30),
                   const SizedBox(width: 15),
-                  Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Brian Walker",
-                          style: _myNameStyle,
-                        ),
-                        const SizedBox(height: 7),
-                        Text("Software Engineer", style: _myInfoStyle)
-                      ])
+                  _myInfo(),
+                  const Spacer(),
+                  Icon(Icons.edit, color: ColorsPlus.secondaryColor),
+                  const SizedBox(width: 24),
                 ],
               ),
             ),
           ),
-        ]),
-      );
+        ),
+      ]),
+    );
+  }
 
   InkWell _contactCard(Map contact) {
     ImageProvider<Object> imageProvider =
@@ -84,7 +140,7 @@ class _ContactsPageState extends State<ContactsPage> {
       imageProvider = MemoryImage(contact['photo']);
     }
     return InkWell(
-      onTap: (() => DialogPlus.showConfirmationDialog(
+      onTap: (() => DialogPlus.showDialogPlus(
           context: context,
           title: AutoSizeText.rich(DialogPlus.contactMethodText(contact)),
           content: Column(
@@ -93,7 +149,7 @@ class _ContactsPageState extends State<ContactsPage> {
               _createSmsBTN(phoneNumber: contact['phone'])
             ],
           ),
-          onSubmitTap: () => Navigator.pop(context),
+          onSubmitTap: () {},
           onCancelTap: null,
           submitText: 'Back',
           cancelText: '')),
@@ -200,8 +256,6 @@ class _ContactsPageState extends State<ContactsPage> {
             backgroundColor:
                 MaterialStateProperty.all(ColorsPlus.secondaryColor)),
         onPressed: () {
-          // Clears contact dialog
-          Navigator.pop(context);
           _makeCall(phoneNumber);
         },
         child: Icon(Icons.call, color: ColorsPlus.primaryColor));
@@ -213,8 +267,6 @@ class _ContactsPageState extends State<ContactsPage> {
             backgroundColor:
                 MaterialStateProperty.all(ColorsPlus.secondaryColor)),
         onPressed: () {
-          // Clears contact dialog
-          Navigator.pop(context);
           _createSMS(phoneNumber);
         },
         child: Icon(Icons.sms, color: ColorsPlus.primaryColor));
@@ -255,7 +307,7 @@ class _ContactsPageState extends State<ContactsPage> {
                     _filterSearchResults(value);
                   },
                 )),
-            _myContactCard,
+            _myContactCard(),
             _contacts.isNotEmpty
                 ? _contactList(_contacts)
                 : _noMatchingContactsMSG(numToContact: _searchBarContr.text)
