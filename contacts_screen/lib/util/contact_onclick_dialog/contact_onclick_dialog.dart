@@ -44,7 +44,12 @@ class ConfirmationDialog {
     );
   }
 
-  static TextSpan dialogTitleText(Map contact) {
+  /// Returns 'How would you like to contact ... ?'
+  /// 
+  /// where '...' represents the given contact's name.
+  /// 
+  /// Example: 'How would you like to contact Jerry ?'
+  static TextSpan contactMethodText(Map contact) {
     return TextSpan(
         text: 'How would you like to contact ',
         children: <InlineSpan>[
