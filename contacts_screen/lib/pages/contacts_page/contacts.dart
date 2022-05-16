@@ -184,7 +184,7 @@ class _ContactsPageState extends State<ContactsPage> {
       const Center(
           child: Text("No contacts to show.", style: TextStyle(fontSize: 20))),
       const SizedBox(height: 10),
-      if (int.tryParse(numToContact) != null)
+      if (int.tryParse(numToContact) != null && numToContact.length >= 7)
         Column(
           children: [
             _makeCallBTN(phoneNumber: numToContact),
