@@ -1,6 +1,5 @@
-import 'package:my_contacts/theme/colors.dart';
-
-import '../../util/dialog.dart/dialog.dart';
+import '/theme/colors.dart';
+import '/util/dialog.dart/dialog.dart';
 
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';

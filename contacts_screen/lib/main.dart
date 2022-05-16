@@ -1,5 +1,6 @@
+import '/pages/contacts_page/contacts.dart';
+
 import 'package:flutter/material.dart';
-import 'package:my_contacts/pages/contacts_page/contacts.dart';
 
 void main() => runApp(const MyApp());
 

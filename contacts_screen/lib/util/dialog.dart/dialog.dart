@@ -1,5 +1,6 @@
+import '/theme/colors.dart';
+
 import 'package:flutter/material.dart';
-import 'package:my_contacts/theme/colors.dart';
 
 class DialogPlus {
   /// Shows confirmation dialog to user.
