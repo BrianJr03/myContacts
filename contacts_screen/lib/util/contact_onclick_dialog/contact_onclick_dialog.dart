@@ -51,7 +51,7 @@ class ConfirmationDialog {
   /// Example: 'How would you like to contact Jerry ?'
   static TextSpan contactMethodText(Map contact) {
     return TextSpan(
-        text: 'How would you like to contact ',
+        text: 'Contact ',
         children: <InlineSpan>[
           TextSpan(
               text: '${contact['name']}',
@@ -61,7 +61,7 @@ class ConfirmationDialog {
                   color: Color(0xff53a99a)),
               children: const [
                 TextSpan(
-                    text: ' ?',
+                    text: '?',
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
