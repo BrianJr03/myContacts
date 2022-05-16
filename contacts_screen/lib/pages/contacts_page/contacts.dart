@@ -10,8 +10,9 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  TextStyle get myNameStyle => const TextStyle(fontSize: 25);
-  TextStyle get myInfoStyle => TextStyle(fontSize: 15, color: Colors.grey[600]);
+  TextStyle get _myNameStyle => const TextStyle(fontSize: 25);
+  TextStyle get _myInfoStyle =>
+      TextStyle(fontSize: 15, color: Colors.grey[600]);
 
   final List<Map> _contacts = [];
   final List<String> _contactNames = [];
@@ -20,6 +21,19 @@ class _ContactsPageState extends State<ContactsPage> {
   void initState() {
     super.initState();
     _getContacts();
+  }
+
+  void _getContacts() async {
+    if (await FlutterContacts.requestPermission()) {
+      List<Contact> contacts = await FlutterContacts.getContacts(
+          withPhoto: true, withProperties: true);
+      setState(() {
+        for (var contact in contacts) {
+          _contactNames.add("${contact.name.first} ${contact.name.last}");
+          _contacts.add({"name": "${contact.name.first} ${contact.name.last}"});
+        }
+      });
+    }
   }
 
   SliverList get _myContactCard => SliverList(
@@ -42,10 +56,10 @@ class _ContactsPageState extends State<ContactsPage> {
                       children: [
                         Text(
                           "Brian Walker",
-                          style: myNameStyle,
+                          style: _myNameStyle,
                         ),
                         const SizedBox(height: 7),
-                        Text("Software Engineer", style: myInfoStyle)
+                        Text("Software Engineer", style: _myInfoStyle)
                       ])
                 ],
               ),
@@ -53,6 +67,14 @@ class _ContactsPageState extends State<ContactsPage> {
           ),
         ]),
       );
+
+  SliverList get _noImportedContactsMSG => SliverList(
+          delegate: SliverChildListDelegate([
+        const SizedBox(height: 10),
+        const Center(
+            child: Text("No contacts have been imported.",
+                style: TextStyle(fontSize: 20)))
+      ]));
 
   SliverGroupedListView _contactList(List<dynamic> contactList) {
     return SliverGroupedListView<dynamic, String>(
@@ -95,19 +117,6 @@ class _ContactsPageState extends State<ContactsPage> {
         );
       },
     );
-  }
-
-  void _getContacts() async {
-    if (await FlutterContacts.requestPermission()) {
-      List<Contact> contacts = await FlutterContacts.getContacts(
-          withPhoto: true, withProperties: true);
-      setState(() {
-        for (var contact in contacts) {
-          _contactNames.add("${contact.name.first} ${contact.name.last}");
-          _contacts.add({"name": "${contact.name.first} ${contact.name.last}"});
-        }
-      });
-    }
   }
 
   void _filterSearchResults(String query) {
@@ -160,7 +169,9 @@ class _ContactsPageState extends State<ContactsPage> {
                 },
               )),
           _myContactCard,
-          _contactList(_contacts)
+          _contacts.isNotEmpty
+              ? _contactList(_contacts)
+              : _noImportedContactsMSG
         ],
       ))),
     );
