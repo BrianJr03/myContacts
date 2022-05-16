@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '/util/contact_onclick_dialog/contact_onclick_dialog.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({Key? key}) : super(key: key);
@@ -82,7 +83,8 @@ class _ContactsPageState extends State<ContactsPage> {
     return InkWell(
       onTap: (() => ConfirmationDialog.showConfirmationDialog(
           context: context,
-          title: AutoSizeText.rich(ConfirmationDialog.contactMethodText(contact)),
+          title:
+              AutoSizeText.rich(ConfirmationDialog.contactMethodText(contact)),
           content: Column(
             children: [
               ElevatedButton(
@@ -188,8 +190,8 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
-  void _makeCall(String contactNumber) {
-    launchUrlString("tel://$contactNumber");
+  void _makeCall(String contactNumber) async {
+    await FlutterPhoneDirectCaller.callNumber(contactNumber);
   }
 
   void _createSMS(String contactNumber) {
