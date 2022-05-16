@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 
-class ContactsPage extends StatelessWidget {
-  ContactsPage({Key? key}) : super(key: key);
+class ContactsPage extends StatefulWidget {
+  const ContactsPage({Key? key}) : super(key: key);
 
+  @override
+  State<ContactsPage> createState() => _ContactsPageState();
+}
+
+class _ContactsPageState extends State<ContactsPage> {
   TextStyle get contactNameStyle => const TextStyle(fontSize: 25);
+
   TextStyle get contactInfoStyle =>
       TextStyle(fontSize: 15, color: Colors.grey[600]);
+
+  final List<String> contactNames = [];
 
   final _contacts = [
     {'name': '*'},
@@ -17,6 +25,12 @@ class ContactsPage extends StatelessWidget {
     {'name': 'Mike'},
     {'name': 'Danny'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _populateContactNames();
+  }
 
   SliverList get myContactCard => SliverList(
         delegate: SliverChildListDelegate([
@@ -93,6 +107,44 @@ class ContactsPage extends StatelessWidget {
     );
   }
 
+  void _populateContactNames() {
+    for (var contact in _contacts) {
+      contactNames.add(contact['name']!);
+    }
+  }
+
+  void filterSearchResults(String query) {
+    if (query.isNotEmpty) {
+      List<String> queriedNames = [];
+
+      for (var name in contactNames) {
+        if (name.contains(query)) {
+          queriedNames.add(name);
+        }
+      }
+      setState(() {
+        _contacts.clear();
+        for (var name in queriedNames) {
+          _contacts.add({"name": name});
+        }
+      });
+      return;
+    } else {
+      setState(() {
+        _contacts.clear();
+        _contacts.addAll([
+          {'name': '*'},
+          {'name': 'John'},
+          {'name': 'Will'},
+          {'name': 'Beth'},
+          {'name': 'Miranda'},
+          {'name': 'Mike'},
+          {'name': 'Danny'},
+        ]);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -114,6 +166,9 @@ class ContactsPage extends StatelessWidget {
                   hintStyle: TextStyle(color: Colors.white),
                   suffixIcon: Icon(Icons.search, color: Colors.white),
                 ),
+                onChanged: (value) {
+                  filterSearchResults(value);
+                },
                 onSubmitted: (value) {},
               )),
           myContactCard,
