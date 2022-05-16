@@ -126,7 +126,7 @@ class _ContactsPageState extends State<ContactsPage> {
           delegate: SliverChildListDelegate([
         const SizedBox(height: 10),
         const Center(
-            child: Text("No contacts have been imported.",
+            child: Text("No contacts to show.",
                 style: TextStyle(fontSize: 20)))
       ]));
 
@@ -201,37 +201,36 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-          body: Center(
-              child: _contacts.isNotEmpty
-                  ? CustomScrollView(
-                      slivers: [
-                        SliverAppBar(
-                            backgroundColor: const Color(0xff53a99a),
-                            floating: true,
-                            leading: const Icon(Icons.contacts),
-                            title: TextField(
-                              style: const TextStyle(color: Colors.white),
-                              cursorColor: Colors.white,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Search Contacts",
-                                hintStyle: TextStyle(color: Colors.white),
-                                suffixIcon:
-                                    Icon(Icons.search, color: Colors.white),
-                              ),
-                              onChanged: (value) {
-                                _filterSearchResults(value);
-                              },
-                            )),
-                        _myContactCard,
-                        _contacts.isNotEmpty
-                            ? _contactList(_contacts)
-                            : _noImportedContactsMSG
-                      ],
-                    )
-                  : const CircularProgressIndicator())),
-    );
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+            body: Center(
+                child:
+                    CustomScrollView(
+          slivers: [
+            SliverAppBar(
+                backgroundColor: const Color(0xff53a99a),
+                floating: true,
+                leading: const Icon(Icons.contacts),
+                title: TextField(
+                  style: const TextStyle(color: Colors.white),
+                  cursorColor: Colors.white,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Search Contacts",
+                    hintStyle: TextStyle(color: Colors.white),
+                    suffixIcon: Icon(Icons.search, color: Colors.white),
+                  ),
+                  onChanged: (value) {
+                    _filterSearchResults(value);
+                  },
+                )),
+            _myContactCard,
+            _contacts.isNotEmpty
+                ? _contactList(_contacts)
+                : _noImportedContactsMSG
+          ],
+        )
+
+                )));
   }
 }
