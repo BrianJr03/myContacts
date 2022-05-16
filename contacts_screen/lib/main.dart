@@ -8,10 +8,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'myContacts',
-      theme: ThemeData(),
-      home: const ContactsPage(),
+      home: ContactsPage(),
       debugShowCheckedModeBanner: false,
     );
   }
