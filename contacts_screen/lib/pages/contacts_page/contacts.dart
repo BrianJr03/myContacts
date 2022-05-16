@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import '/util/contact_onclick_dialog/contact_onclick_dialog.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class _ContactsPageState extends State<ContactsPage> {
           _contacts.add({
             "name": "${contact.name.first} ${contact.name.last}",
             "photo": contact.photoOrThumbnail,
-            "phone": contact.phones[0].normalizedNumber
+            "phone": contact.phones[0].number,
           });
         }
       });
@@ -78,7 +79,29 @@ class _ContactsPageState extends State<ContactsPage> {
       imageProvider = MemoryImage(contact['photo']);
     }
     return InkWell(
-      onTap: (() => _makeCall(contact['phone'])),
+      onTap: (() => ConfirmationDialog.showConfirmationDialog(
+          context: context,
+          title: Text("How would you like to contact ${contact['name']}?"),
+          content: Column(
+            children: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(const Color(0xff53a99a))),
+                  onPressed: () => _makeCall(contact['phone']),
+                  child: const Icon(Icons.call, color: Colors.white)),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(const Color(0xff53a99a))),
+                  onPressed: () => _createSMS(contact['phone']),
+                  child: const Icon(Icons.sms, color: Colors.white))
+            ],
+          ),
+          onSubmitTap: () => Navigator.pop(context),
+          onCancelTap: () => Navigator.pop(context),
+          submitText: 'Back',
+          cancelText: '')),
       child: Card(
         elevation: 5.0,
         margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
@@ -90,7 +113,7 @@ class _ContactsPageState extends State<ContactsPage> {
             backgroundImage: imageProvider,
           ),
           title: Text(contact['name'].toString().trim()),
-          trailing: const Icon(Icons.call, color: Color(0xff53a99a)),
+          trailing: const Icon(Icons.contact_phone, color: Color(0xff53a99a)),
         ),
       ),
     );
@@ -151,7 +174,7 @@ class _ContactsPageState extends State<ContactsPage> {
           _contacts.add({
             "name": contact['name'],
             "photo": contact['photo'],
-            "phone": contact['phone']
+            "phone": contact['phone'],
           });
         }
       });
@@ -166,6 +189,10 @@ class _ContactsPageState extends State<ContactsPage> {
 
   void _makeCall(String contactNumber) {
     launchUrlString("tel://$contactNumber");
+  }
+
+  void _createSMS(String contactNumber) {
+    launchUrlString('sms:$contactNumber');
   }
 
   @override
