@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_contacts/theme/colors.dart';
 
 class DialogPlus {
   /// Shows confirmation dialog to user.
@@ -39,7 +40,7 @@ class DialogPlus {
             TextButton(
               onPressed: onSubmitTap,
               child: Text(submitText,
-                  style: const TextStyle(color: Color(0xff53a99a))),
+                  style:  TextStyle(color: ColorsPlus.secondaryColor)),
             ),
         ],
       ),
@@ -54,7 +55,7 @@ class DialogPlus {
       TextEditingController? contr}) {
     return TextField(
         enabled: enabled,
-        cursorColor: const Color(0xff53a99a),
+        cursorColor: ColorsPlus.secondaryColor,
         style: const TextStyle().copyWith(
           fontFamily: 'Open Sans',
           color: Colors.black,

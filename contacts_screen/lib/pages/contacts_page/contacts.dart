@@ -1,3 +1,5 @@
+import 'package:my_contacts/theme/colors.dart';
+
 import '../../util/dialog.dart/dialog.dart';
 
 import 'package:flutter/material.dart';
@@ -17,7 +19,7 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> {
   TextStyle get _myNameStyle => const TextStyle(fontSize: 25);
   TextStyle get _myInfoStyle =>
-      TextStyle(fontSize: 15, color: Colors.grey[600]);
+      TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
 
   final List<Map> _contacts = [];
 
@@ -49,7 +51,7 @@ class _ContactsPageState extends State<ContactsPage> {
             height: 100,
             child: Card(
               elevation: 5.0,
-              shadowColor: const Color(0xff53a99a),
+              shadowColor: ColorsPlus.secondaryColor,
               child: Row(
                 children: [
                   const SizedBox(width: 5),
@@ -84,30 +86,29 @@ class _ContactsPageState extends State<ContactsPage> {
     return InkWell(
       onTap: (() => DialogPlus.showConfirmationDialog(
           context: context,
-          title:
-              AutoSizeText.rich(DialogPlus.contactMethodText(contact)),
+          title: AutoSizeText.rich(DialogPlus.contactMethodText(contact)),
           content: Column(
             children: [
               ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all(const Color(0xff53a99a))),
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
                   onPressed: () {
                     // Clears contact dialog
                     Navigator.pop(context);
                     _makeCall(contact['phone']);
                   },
-                  child: const Icon(Icons.call, color: Colors.white)),
+                  child: Icon(Icons.call, color: ColorsPlus.primaryColor)),
               ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all(const Color(0xff53a99a))),
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
                   onPressed: () {
                     // Clears contact dialog
                     Navigator.pop(context);
                     _createSMS(contact['phone']);
                   },
-                  child: const Icon(Icons.sms, color: Colors.white))
+                  child: Icon(Icons.sms, color: ColorsPlus.primaryColor))
             ],
           ),
           onSubmitTap: () => Navigator.pop(context),
@@ -148,7 +149,7 @@ class _ContactsPageState extends State<ContactsPage> {
       groupSeparatorBuilder: (String value) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
-          color: const Color(0xff53a99a),
+          color: ColorsPlus.secondaryColor,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -156,10 +157,10 @@ class _ContactsPageState extends State<ContactsPage> {
               Text(
                 value,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    color: ColorsPlus.primaryColor),
               ),
             ],
           ),
@@ -215,17 +216,18 @@ class _ContactsPageState extends State<ContactsPage> {
                 child: CustomScrollView(
           slivers: [
             SliverAppBar(
-                backgroundColor: const Color(0xff53a99a),
+                backgroundColor: ColorsPlus.secondaryColor,
                 floating: true,
                 leading: const Icon(Icons.contacts),
                 title: TextField(
-                  style: const TextStyle(color: Colors.white),
-                  cursorColor: Colors.white,
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: ColorsPlus.primaryColor),
+                  cursorColor: ColorsPlus.primaryColor,
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: "Search Contacts",
-                    hintStyle: TextStyle(color: Colors.white),
-                    suffixIcon: Icon(Icons.search, color: Colors.white),
+                    hintStyle: TextStyle(color: ColorsPlus.primaryColor),
+                    suffixIcon:
+                        Icon(Icons.search, color: ColorsPlus.primaryColor),
                   ),
                   onChanged: (value) {
                     _filterSearchResults(value);
