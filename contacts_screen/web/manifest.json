@@ -1,6 +1,6 @@
 {
-    "name": "contacts_screen",
-    "short_name": "contacts_screen",
+    "name": "myContacts",
+    "short_name": "myContacts",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

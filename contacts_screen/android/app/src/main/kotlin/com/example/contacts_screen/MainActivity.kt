@@ -1,4 +1,4 @@
-package com.example.contacts_screen
+package com.example.myContacts
 
 import io.flutter.embedding.android.FlutterActivity
 

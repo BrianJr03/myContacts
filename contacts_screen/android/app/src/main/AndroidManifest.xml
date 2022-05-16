@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.contacts_screen">
+    package="com.example.myContacts">
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
    <application
-        android:label="contacts_screen"
+        android:label="myContacts"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
