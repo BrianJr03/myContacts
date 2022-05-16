@@ -9,13 +9,15 @@ class DialogPlus {
   /// a significant action such as account deletion.
   ///
   /// [onSubmitTap] is executed when a user confirms their action.
+  /// The dialog is closed before any other code is executed.
   ///
   /// [onCancelTap] is executed when a user cancels their action.
+  /// The dialog is closed before any other code is executed.
   ///
   /// [submitText] is displayed as a button to confirm action. Ex: 'OK'
   ///
   /// [cancelText] is displayed as a button to cancel action. Ex: 'BACK'
-  static void showConfirmationDialog({
+  static void showDialogPlus({
     required BuildContext context,
     required Widget title,
     required Widget content,
@@ -33,13 +35,21 @@ class DialogPlus {
         actions: <Widget>[
           if (onCancelTap != null)
             TextButton(
-              onPressed: onCancelTap,
+              onPressed: () {
+                // Clears dialog
+                Navigator.pop(context);
+                onCancelTap();
+              },
               child:
                   Text(cancelText, style: const TextStyle(color: Colors.black)),
             ),
           if (onSubmitTap != null)
             TextButton(
-              onPressed: onSubmitTap,
+              onPressed: () {
+                // Clears dialog
+                Navigator.pop(context);
+                onSubmitTap();
+              },
               child: Text(submitText,
                   style: TextStyle(color: ColorsPlus.secondaryColor)),
             ),
@@ -53,8 +63,10 @@ class DialogPlus {
       {bool enabled = true,
       TextInputType kbType = TextInputType.text,
       String hintText = 'Enter value here',
-      TextEditingController? contr}) {
+      TextEditingController? contr,
+      Function(String)? onSubmitted}) {
     return TextField(
+        onSubmitted: onSubmitted ?? (s) {},
         enabled: enabled,
         cursorColor: ColorsPlus.secondaryColor,
         style: const TextStyle().copyWith(
