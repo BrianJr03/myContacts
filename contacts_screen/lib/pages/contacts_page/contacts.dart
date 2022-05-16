@@ -82,7 +82,7 @@ class _ContactsPageState extends State<ContactsPage> {
     return InkWell(
       onTap: (() => ConfirmationDialog.showConfirmationDialog(
           context: context,
-          title: AutoSizeText.rich(ConfirmationDialog.dialogTitleText(contact)),
+          title: AutoSizeText.rich(ConfirmationDialog.contactMethodText(contact)),
           content: Column(
             children: [
               ElevatedButton(
