@@ -43,4 +43,25 @@ class ConfirmationDialog {
       ),
     );
   }
+
+  static TextSpan dialogTitleText(Map contact) {
+    return TextSpan(
+        text: 'How would you like to contact ',
+        children: <InlineSpan>[
+          TextSpan(
+              text: '${contact['name']}',
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff53a99a)),
+              children: const [
+                TextSpan(
+                    text: ' ?',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black))
+              ])
+        ]);
+  }
 }

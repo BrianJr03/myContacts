@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -81,7 +82,7 @@ class _ContactsPageState extends State<ContactsPage> {
     return InkWell(
       onTap: (() => ConfirmationDialog.showConfirmationDialog(
           context: context,
-          title: Text("How would you like to contact ${contact['name']}?"),
+          title: AutoSizeText.rich(ConfirmationDialog.dialogTitleText(contact)),
           content: Column(
             children: [
               ElevatedButton(
