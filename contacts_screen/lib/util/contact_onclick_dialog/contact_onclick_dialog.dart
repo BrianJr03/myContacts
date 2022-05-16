@@ -54,7 +54,7 @@ class ConfirmationDialog {
         text: 'Contact ',
         children: <InlineSpan>[
           TextSpan(
-              text: '${contact['name']}',
+              text: contact['name'].toString().trim(),
               style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
