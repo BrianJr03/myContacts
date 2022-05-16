@@ -1,9 +1,10 @@
+import '../../util/dialog.dart/dialog.dart';
+
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '/util/contact_onclick_dialog/contact_onclick_dialog.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class ContactsPage extends StatefulWidget {
@@ -81,10 +82,10 @@ class _ContactsPageState extends State<ContactsPage> {
       imageProvider = MemoryImage(contact['photo']);
     }
     return InkWell(
-      onTap: (() => ConfirmationDialog.showConfirmationDialog(
+      onTap: (() => DialogPlus.showConfirmationDialog(
           context: context,
           title:
-              AutoSizeText.rich(ConfirmationDialog.contactMethodText(contact)),
+              AutoSizeText.rich(DialogPlus.contactMethodText(contact)),
           content: Column(
             children: [
               ElevatedButton(
