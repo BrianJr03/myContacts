@@ -91,18 +91,26 @@ class _ContactsPageState extends State<ContactsPage> {
                   style: ButtonStyle(
                       backgroundColor:
                           MaterialStateProperty.all(const Color(0xff53a99a))),
-                  onPressed: () => _makeCall(contact['phone']),
+                  onPressed: () {
+                    // Clears contact dialog
+                    Navigator.pop(context);
+                    _makeCall(contact['phone']);
+                  },
                   child: const Icon(Icons.call, color: Colors.white)),
               ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:
                           MaterialStateProperty.all(const Color(0xff53a99a))),
-                  onPressed: () => _createSMS(contact['phone']),
+                  onPressed: () {
+                    // Clears contact dialog
+                    Navigator.pop(context);
+                    _createSMS(contact['phone']);
+                  },
                   child: const Icon(Icons.sms, color: Colors.white))
             ],
           ),
           onSubmitTap: () => Navigator.pop(context),
-          onCancelTap: () => Navigator.pop(context),
+          onCancelTap: null,
           submitText: 'Back',
           cancelText: '')),
       child: Card(
@@ -126,8 +134,7 @@ class _ContactsPageState extends State<ContactsPage> {
           delegate: SliverChildListDelegate([
         const SizedBox(height: 10),
         const Center(
-            child: Text("No contacts to show.",
-                style: TextStyle(fontSize: 20)))
+            child: Text("No contacts to show.", style: TextStyle(fontSize: 20)))
       ]));
 
   SliverGroupedListView _contactList(List<dynamic> contactList) {
@@ -204,8 +211,7 @@ class _ContactsPageState extends State<ContactsPage> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
             body: Center(
-                child:
-                    CustomScrollView(
+                child: CustomScrollView(
           slivers: [
             SliverAppBar(
                 backgroundColor: const Color(0xff53a99a),
@@ -229,8 +235,6 @@ class _ContactsPageState extends State<ContactsPage> {
                 ? _contactList(_contacts)
                 : _noImportedContactsMSG
           ],
-        )
-
-                )));
+        ))));
   }
 }

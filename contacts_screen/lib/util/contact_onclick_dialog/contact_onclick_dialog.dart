@@ -17,8 +17,8 @@ class ConfirmationDialog {
     required BuildContext context,
     required Widget title,
     required Widget content,
-    required Function() onSubmitTap,
-    required Function() onCancelTap,
+    required Function()? onSubmitTap,
+    required Function()? onCancelTap,
     required String submitText,
     required String cancelText,
   }) {
@@ -29,11 +29,13 @@ class ConfirmationDialog {
         content: SingleChildScrollView(
             scrollDirection: Axis.vertical, child: content),
         actions: <Widget>[
+          if (onCancelTap != null)
           TextButton(
             onPressed: onCancelTap,
             child:
                 Text(cancelText, style: const TextStyle(color: Colors.black)),
           ),
+          if (onSubmitTap != null)
           TextButton(
             onPressed: onSubmitTap,
             child: Text(submitText,
