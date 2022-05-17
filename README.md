@@ -17,8 +17,8 @@ A simple contacts app that allows a user to load their stored contacts to be dis
     - This card contains a `photo`, `name` and `description` of the user. 
     - These values can be updated in the `Update Info Dialog`.
     
-- Phone Calls / SMS
-  - After clicking on a contact card, the user can reach the contact either via direct `phone call` or `SMS`.
+- Phone Calls / SMS / Email
+  - After clicking on a contact card, the user can reach the contact either via direct `phone call`, `SMS` or `email`.
   - If there are no maching contacts after search, a user can Call or SMS the query if it's a phone number.
   
 - Clean Architecture
