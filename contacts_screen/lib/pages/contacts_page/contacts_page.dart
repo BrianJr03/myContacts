@@ -101,6 +101,59 @@ class _ContactsPageState extends State<ContactsPage> {
     ]);
   }
 
+  void _showUpdateInfoDialog() {
+    DialogPlus.showDialogPlus(
+        context: context,
+        title: const Text("Update Info"),
+        content: Column(
+          children: [
+            _avatar(radius: 70),
+            const SizedBox(height: 20),
+            _myInfo(),
+            const SizedBox(height: 20),
+            DialogPlus.dialogTextField(
+              hintText: "Edit name",
+              contr: _myNameContr,
+            ),
+            const SizedBox(height: 5),
+            DialogPlus.dialogTextField(
+              hintText: "Edit info",
+              contr: _myInfoContr,
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _setProfilePic();
+                },
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                child: const Text("Change Photo"))
+          ],
+        ),
+        onSubmitTap: () {
+          if (_myNameContr.text.isNotEmpty && _myInfoContr.text.isNotEmpty) {
+            setState(() {
+              _myNameStr = _myNameContr.text.trim();
+              _myInfoStr = _myInfoContr.text.trim();
+            });
+            _saveMyNameAndInfo();
+          } else {
+            Fluttertoast.showToast(
+                msg: "Please provide name and info",
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                backgroundColor: ColorsPlus.secondaryColor,
+                textColor: ColorsPlus.primaryColor,
+                fontSize: 16.0);
+          }
+        },
+        onCancelTap: () {},
+        submitText: "Save",
+        cancelText: "Cancel");
+  }
+
   SliverList _myContactCard() {
     return SliverList(
       delegate: SliverChildListDelegate([
@@ -108,57 +161,7 @@ class _ContactsPageState extends State<ContactsPage> {
           height: 100,
           child: InkWell(
             onTap: () {
-              DialogPlus.showDialogPlus(
-                  context: context,
-                  title: const Text("Update Info"),
-                  content: Column(
-                    children: [
-                      _avatar(radius: 70),
-                      const SizedBox(height: 20),
-                      _myInfo(),
-                      const SizedBox(height: 20),
-                      DialogPlus.dialogTextField(
-                        hintText: "Edit name",
-                        contr: _myNameContr,
-                      ),
-                      const SizedBox(height: 5),
-                      DialogPlus.dialogTextField(
-                        hintText: "Edit info",
-                        contr: _myInfoContr,
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _setProfilePic();
-                          },
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  ColorsPlus.secondaryColor)),
-                          child: const Text("Change Photo"))
-                    ],
-                  ),
-                  onSubmitTap: () {
-                    if (_myNameContr.text.isNotEmpty &&
-                        _myInfoContr.text.isNotEmpty) {
-                      setState(() {
-                        _myNameStr = _myNameContr.text.trim();
-                        _myInfoStr = _myInfoContr.text.trim();
-                      });
-                      _saveMyNameAndInfo();
-                    } else {
-                      Fluttertoast.showToast(
-                          msg: "Please provide name and info",
-                          toastLength: Toast.LENGTH_SHORT,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: ColorsPlus.secondaryColor,
-                          textColor: ColorsPlus.primaryColor,
-                          fontSize: 16.0);
-                    }
-                  },
-                  onCancelTap: () {},
-                  submitText: "Save",
-                  cancelText: "Cancel");
+              _showUpdateInfoDialog();
             },
             child: Card(
               elevation: 5.0,
