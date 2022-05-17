@@ -107,7 +107,12 @@ class _ContactsPageState extends State<ContactsPage> {
         title: const Text("Update Info"),
         content: Column(
           children: [
-            _avatar(radius: 70),
+            InkWell(
+                onTap: (() {
+                  Navigator.pop(context);
+                  _setProfilePic();
+                }),
+                child: _avatar(radius: 70)),
             const SizedBox(height: 20),
             _myInfo(),
             const SizedBox(height: 20),
