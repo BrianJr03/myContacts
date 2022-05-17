@@ -315,7 +315,10 @@ class _ContactsPageState extends State<ContactsPage> {
                     ])),
                 context: context,
                 onCancelTap: () {},
-                onSubmitTap: () => _makeCall(phoneNumber),
+                onSubmitTap: () {
+                  Navigator.pop(context);
+                  _makeCall(phoneNumber);
+                },
                 cancelText: 'Back',
                 submitText: 'Call',
                 title: const Text("Make Call"));
