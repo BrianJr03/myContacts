@@ -120,11 +120,8 @@ class DialogPlus {
               color: ColorsPlus.secondaryColor),
           children: [
             TextSpan(
-                text: '\nPhone: ${contact['phone'].toString()}\nEmail: ${contact['email']}',
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black))
+                text:
+                    '\nPhone: ${contact['phone'].toString()}\nEmail: ${contact['email']}')
           ])
     ]);
   }
