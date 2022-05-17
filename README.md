@@ -2,7 +2,7 @@
 
 A simple contacts app, built with Flutter.
 
-![alt text](https://github.com/[BrianJr03]/[myContacts]/blob/[master]/app_ss.jpg?raw=true)
+![alt text](https://github.com/BrianJr03/myContacts/blob/master/app_ss.jpg)
 
 ## Features
 
