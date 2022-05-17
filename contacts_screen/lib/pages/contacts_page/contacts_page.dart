@@ -64,7 +64,7 @@ class _ContactsPageState extends State<ContactsPage> {
             "photo": contact.photoOrThumbnail,
             "phone": contact.phones[0].number,
             "phoneNorm": contact.phones[0].normalizedNumber,
-            "email": contact.emails.isNotEmpty ? contact.emails[0].address : ""
+            "email": contact.emails.isNotEmpty ? contact.emails[0].address : "N/A"
           });
         }
       });
@@ -411,11 +411,11 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   void _sendEmail(String email) {
-    if (email != "") {
+    if (email != "N/A") {
       launchUrlString('mailto:$email');
     }
     Fluttertoast.showToast(
-        msg: "No email found.",
+        msg: "No email found for this contact",
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: ColorsPlus.secondaryColor,
