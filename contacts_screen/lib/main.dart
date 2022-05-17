@@ -7,18 +7,17 @@ import 'package:flutter/services.dart';
 import 'dart:developer' as dev;
 
 void main() {
-  if (Platform.isIOS || Platform.isAndroid) {
-    WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.transparent,
-    ));
-    runApp(const MyApp());
-  } else {
+  if (!(Platform.isIOS || Platform.isAndroid)) {
     dev.log("This app is only intended for iOS and Android");
     exit(1);
   }
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+    statusBarColor: Colors.transparent,
+  ));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
