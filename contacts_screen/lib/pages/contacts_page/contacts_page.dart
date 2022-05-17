@@ -64,6 +64,7 @@ class _ContactsPageState extends State<ContactsPage> {
             "photo": contact.photoOrThumbnail,
             "phone": contact.phones[0].number,
             "phoneNorm": contact.phones[0].normalizedNumber,
+            "email": contact.emails[0]
           });
         }
       });
@@ -304,6 +305,7 @@ class _ContactsPageState extends State<ContactsPage> {
             "photo": contact['photo'],
             "phone": contact['phone'],
             "phoneNorm": contact['phoneNorm'],
+            "email" : contact['email']
           });
         }
       });
