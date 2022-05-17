@@ -110,10 +110,10 @@ class DialogPlus {
     return TextSpan(text: 'Contact ', children: <InlineSpan>[
       TextSpan(
           text: contact['name'].toString().trim(),
-          style: const TextStyle(
+          style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xff53a99a)),
+              color: ColorsPlus.secondaryColor),
           children: [
             TextSpan(
                 text: '\n@ ${contact['phone'].toString()}',

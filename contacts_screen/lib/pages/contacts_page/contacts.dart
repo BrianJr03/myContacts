@@ -2,6 +2,7 @@ import '/theme/colors.dart';
 import '/util/dialog.dart/dialog.dart';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
@@ -31,6 +32,14 @@ class _ContactsPageState extends State<ContactsPage> {
   void initState() {
     super.initState();
     _getContacts();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _myInfoContr.dispose();
+    _myNameContr.dispose();
+    _searchBarContr.dispose();
   }
 
   void _getContacts() async {
@@ -77,10 +86,10 @@ class _ContactsPageState extends State<ContactsPage> {
             onTap: () {
               DialogPlus.showDialogPlus(
                   context: context,
-                  title: const Text(""),
+                  title: const Text("Update Info"),
                   content: Column(
                     children: [
-                      _avatar(radius: 50),
+                      _avatar(radius: 70),
                       const SizedBox(height: 20),
                       _myInfo(),
                       const SizedBox(height: 20),
@@ -103,10 +112,21 @@ class _ContactsPageState extends State<ContactsPage> {
                     ],
                   ),
                   onSubmitTap: () {
-                    setState(() {
-                      _myNameStr = _myNameContr.text.trim();
-                      _myInfoStr = _myInfoContr.text.trim();
-                    });
+                    if (_myNameContr.text.isNotEmpty &&
+                        _myInfoContr.text.isNotEmpty) {
+                      setState(() {
+                        _myNameStr = _myNameContr.text.trim();
+                        _myInfoStr = _myInfoContr.text.trim();
+                      });
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: "Please provide name and info",
+                          toastLength: Toast.LENGTH_SHORT,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: ColorsPlus.secondaryColor,
+                          textColor: ColorsPlus.primaryColor,
+                          fontSize: 16.0);
+                    }
                   },
                   onCancelTap: () {},
                   submitText: "Save",
@@ -117,8 +137,8 @@ class _ContactsPageState extends State<ContactsPage> {
               shadowColor: ColorsPlus.secondaryColor,
               child: Row(
                 children: [
-                  const SizedBox(width: 5),
-                  _avatar(radius: 30),
+                  const SizedBox(width: 15),
+                  _avatar(radius: 25),
                   const SizedBox(width: 15),
                   _myInfo(),
                   const Spacer(),
@@ -240,23 +260,68 @@ class _ContactsPageState extends State<ContactsPage> {
       const Center(
           child: Text("No contacts to show.", style: TextStyle(fontSize: 20))),
       const SizedBox(height: 10),
-      if (int.tryParse(numToContact) != null && numToContact.length >= 7)
+      if (int.tryParse(numToContact) != null &&
+          numToContact.length >= 7 &&
+          numToContact.length <= 11)
         Column(
           children: [
-            _makeCallBTN(phoneNumber: numToContact),
+            _makeCallBTN(phoneNumber: numToContact, noMatchingContact: true),
             _createSmsBTN(phoneNumber: numToContact)
           ],
         )
     ]));
   }
 
-  ElevatedButton _makeCallBTN({required String phoneNumber}) {
+  String _formatPhoneNumber(String phoneNumber) {
+    String formattedPhoneNumber = "";
+    if (phoneNumber.length == 11) {
+      formattedPhoneNumber =
+          // ignore: prefer_adjacent_string_concatenation
+          "\n+${phoneNumber.substring(0, 1)} (${phoneNumber.substring(1, 4)}) " +
+              "${phoneNumber.substring(4, 7)} - ${phoneNumber.substring(7, phoneNumber.length)}";
+    } else if (phoneNumber.length >= 10) {
+      // ignore: prefer_adjacent_string_concatenation
+      formattedPhoneNumber = "\n(${phoneNumber.substring(0, 3)}) " +
+          "${phoneNumber.substring(3, 6)} - ${phoneNumber.substring(6, phoneNumber.length)}";
+    } else {
+      formattedPhoneNumber =
+          "${phoneNumber.substring(0, 3)} - ${phoneNumber.substring(3, phoneNumber.length)}";
+    }
+    return formattedPhoneNumber;
+  }
+
+  ElevatedButton _makeCallBTN(
+      {required String phoneNumber, bool noMatchingContact = false}) {
     return ElevatedButton(
         style: ButtonStyle(
             backgroundColor:
                 MaterialStateProperty.all(ColorsPlus.secondaryColor)),
         onPressed: () {
-          _makeCall(phoneNumber);
+          if (noMatchingContact) {
+            DialogPlus.showDialogPlus(
+                content: AutoSizeText.rich(TextSpan(
+                    text: 'This will call ',
+                    style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                    children: [
+                      TextSpan(
+                          text: _formatPhoneNumber(phoneNumber),
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: ColorsPlus.secondaryColor))
+                    ])),
+                context: context,
+                onCancelTap: () {},
+                onSubmitTap: () => _makeCall(phoneNumber),
+                cancelText: 'Back',
+                submitText: 'Call',
+                title: const Text("Make Call"));
+          } else {
+            _makeCall(phoneNumber);
+          }
         },
         child: Icon(Icons.call, color: ColorsPlus.primaryColor));
   }
@@ -291,7 +356,14 @@ class _ContactsPageState extends State<ContactsPage> {
             SliverAppBar(
                 backgroundColor: ColorsPlus.secondaryColor,
                 floating: true,
-                leading: const Icon(Icons.contacts),
+                leading: InkWell(
+                    onTap: () => setState(() {
+                          _searchBarContr.clear();
+                          _contacts.clear();
+                          _getContacts();
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        }),
+                    child: const Icon(Icons.contacts)),
                 title: TextField(
                   controller: _searchBarContr,
                   style: TextStyle(color: ColorsPlus.primaryColor),
