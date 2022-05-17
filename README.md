@@ -5,10 +5,10 @@ A simple contacts app that allows a user to load their stored contacts to be dis
 ## Features
 
 - Search Functionality
-  - A user can filter through their contacts via name or number with the help of a search bar.
+  - A user can filter through their contacts via `name` or `number` with the help of a search bar.
   
 - Scrollable Contacts List with Sections
-  - Each section of contacts is labled in alphabetical order by the first letter.
+  - Each section of contacts is labled in `alphabetical order` by the first letter.
   - Example: The 'B' section has all contacts whose name begin with 'B'.
   
 - Dynamic Header
@@ -18,7 +18,7 @@ A simple contacts app that allows a user to load their stored contacts to be dis
     - These values can be set in Settings. (coming soon)
     
 - Phone Calls / SMS
-  - After clicking on a contact card, the user can reach the contact either via direct phone call or SMS.
+  - After clicking on a contact card, the user can reach the contact either via direct `phone call` or `SMS`.
   - If there are no maching contacts after search, a user can Call or SMS the query if it's a phone number.
   
 - Clean Architecture
