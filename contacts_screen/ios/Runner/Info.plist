@@ -6,8 +6,10 @@
 	<array>
 		<string>tel</string>
 	</array>
+	<key>NSDocumentDirectory</key>
+	<string>Store data in app folder</string>
 	<key>NSContactUsageDescription</key>
-	<string>Reasoon we need access to the contact list</string>
+	<string>Reason we need access to the contact list</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

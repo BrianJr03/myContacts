@@ -1,8 +1,8 @@
-import 'package:flutter/services.dart';
 
-import '/pages/contacts_page/contacts.dart';
+import 'pages/contacts_page/contacts_page.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

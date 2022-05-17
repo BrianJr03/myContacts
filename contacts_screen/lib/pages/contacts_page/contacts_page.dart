@@ -1,8 +1,12 @@
+import 'dart:io';
 import '/theme/colors.dart';
+import '/util/format/format.dart';
 import '/util/dialog.dart/dialog.dart';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
@@ -18,21 +22,26 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  TextStyle get _myNameStyle => const TextStyle(fontSize: 25);
-  TextStyle get _myInfoStyle =>
-      TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
-  final List<Map> _contacts = [];
-  final _searchBarContr = TextEditingController();
-  final _myNameContr = TextEditingController();
-  final _myInfoContr = TextEditingController();
+  File? _pfp;
 
   String _myNameStr = "My Name";
   String _myInfoStr = "My Info";
+
+  final List<Map> _contacts = [];
+
+  final _myNameContr = TextEditingController();
+  final _myInfoContr = TextEditingController();
+  final _searchBarContr = TextEditingController();
+
+  TextStyle get _myNameStyle => const TextStyle(fontSize: 25);
+  TextStyle get _myInfoStyle =>
+      TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
 
   @override
   void initState() {
     super.initState();
     _getContacts();
+    _getProfilePic();
     _getMyNameAndInfo();
   }
 
@@ -61,11 +70,24 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
-  CircleAvatar _avatar({required double radius}) {
-    return CircleAvatar(
-      radius: radius,
-      backgroundImage: const AssetImage('assets/my_pfp.jpg'),
-    );
+  void _getProfilePic() async {
+    final prefs = await SharedPreferences.getInstance();
+    final value = prefs.getString('_pfp');
+    setState(() {
+      _pfp = File(value.toString());
+    });
+  }
+
+  void _getMyNameAndInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _myNameStr = prefs.getString('myName') != null
+        ? prefs.getString('myName')!
+        : "My Name";
+    _myInfoStr = prefs.getString('myInfo') != null
+        ? prefs.getString('myInfo')!
+        : "My Info";
+    _myNameContr.text = _myNameStr;
+    _myInfoContr.text = _myInfoStr;
   }
 
   Column _myInfo() {
@@ -106,7 +128,10 @@ class _ContactsPageState extends State<ContactsPage> {
                       ),
                       const SizedBox(height: 10),
                       ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _setProfilePic();
+                          },
                           style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all(
                                   ColorsPlus.secondaryColor)),
@@ -154,24 +179,6 @@ class _ContactsPageState extends State<ContactsPage> {
         ),
       ]),
     );
-  }
-
-  void _saveMyNameAndInfo() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('myName', _myNameStr);
-    prefs.setString('myInfo', _myInfoStr);
-  }
-
-  void _getMyNameAndInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _myNameStr = prefs.getString('myName') != null
-        ? prefs.getString('myName')!
-        : "My Name";
-    _myInfoStr = prefs.getString('myInfo') != null
-        ? prefs.getString('myInfo')!
-        : "My Info";
-    _myNameContr.text = _myNameStr;
-    _myInfoContr.text = _myInfoStr;
   }
 
   InkWell _contactCard(Map contact) {
@@ -244,6 +251,33 @@ class _ContactsPageState extends State<ContactsPage> {
     );
   }
 
+  CircleAvatar _avatar({required double radius}) {
+    return CircleAvatar(
+      radius: radius,
+      backgroundImage: _pfp != null
+          ? FileImage(_pfp!) as ImageProvider
+          : const AssetImage('assets/place_holder.png'),
+    );
+  }
+
+  void _saveMyNameAndInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('myName', _myNameStr);
+    prefs.setString('myInfo', _myInfoStr);
+  }
+
+  Future _setProfilePic() async {
+    final prefs = await SharedPreferences.getInstance();
+    final profileImagePicker =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final dir = await getApplicationDocumentsDirectory();
+    await File(profileImagePicker!.path).copy('${dir.path}/image.png');
+    prefs.setString('_pfp', '${dir.path}/image.png');
+    setState(() {
+      _pfp = File(profileImagePicker.path);
+    });
+  }
+
   void _filterSearchResults(String query) {
     if (query.isNotEmpty) {
       List<Map> queriedContacts = [];
@@ -293,24 +327,6 @@ class _ContactsPageState extends State<ContactsPage> {
     ]));
   }
 
-  String _formatPhoneNumber(String phoneNumber) {
-    String formattedPhoneNumber = "";
-    if (phoneNumber.length == 11) {
-      formattedPhoneNumber =
-          // ignore: prefer_adjacent_string_concatenation
-          "\n+${phoneNumber.substring(0, 1)} (${phoneNumber.substring(1, 4)}) " +
-              "${phoneNumber.substring(4, 7)} - ${phoneNumber.substring(7, phoneNumber.length)}";
-    } else if (phoneNumber.length >= 10) {
-      // ignore: prefer_adjacent_string_concatenation
-      formattedPhoneNumber = "\n(${phoneNumber.substring(0, 3)}) " +
-          "${phoneNumber.substring(3, 6)} - ${phoneNumber.substring(6, phoneNumber.length)}";
-    } else {
-      formattedPhoneNumber =
-          "${phoneNumber.substring(0, 3)} - ${phoneNumber.substring(3, phoneNumber.length)}";
-    }
-    return formattedPhoneNumber;
-  }
-
   ElevatedButton _makeCallBTN(
       {required String phoneNumber, bool noMatchingContact = false}) {
     return ElevatedButton(
@@ -328,7 +344,7 @@ class _ContactsPageState extends State<ContactsPage> {
                         color: Colors.black),
                     children: [
                       TextSpan(
-                          text: _formatPhoneNumber(phoneNumber),
+                          text: FormatPlus.formatPhoneNumber(phoneNumber),
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
