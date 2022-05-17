@@ -67,9 +67,9 @@ class DialogPlus {
       TextEditingController? contr,
       Function(String)? onSubmitted}) {
     return TextField(
-      maxLength: 15,
-      maxLines: 1,
-      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+        maxLength: 17,
+        maxLines: 1,
+        maxLengthEnforcement: MaxLengthEnforcement.enforced,
         onSubmitted: onSubmitted ?? (s) {},
         enabled: enabled,
         cursorColor: ColorsPlus.secondaryColor,
@@ -120,7 +120,7 @@ class DialogPlus {
               color: ColorsPlus.secondaryColor),
           children: [
             TextSpan(
-                text: '\n@ ${contact['phone'].toString()}',
+                text: '\n@ ${contact['phone'].toString()}\n${contact['email']}',
                 style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

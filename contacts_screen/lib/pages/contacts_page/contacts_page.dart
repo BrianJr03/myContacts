@@ -64,7 +64,7 @@ class _ContactsPageState extends State<ContactsPage> {
             "photo": contact.photoOrThumbnail,
             "phone": contact.phones[0].number,
             "phoneNorm": contact.phones[0].normalizedNumber,
-            "email": contact.emails[0]
+            "email": contact.emails.isNotEmpty ? contact.emails[0].address : ""
           });
         }
       });
@@ -203,7 +203,8 @@ class _ContactsPageState extends State<ContactsPage> {
           content: Column(
             children: [
               _makeCallBTN(phoneNumber: contact['phone']),
-              _createSmsBTN(phoneNumber: contact['phone'])
+              _createSmsBTN(phoneNumber: contact['phone']),
+              _sendEmailBTN(email: contact['email'])
             ],
           ),
           onSubmitTap: () {},
@@ -305,7 +306,7 @@ class _ContactsPageState extends State<ContactsPage> {
             "photo": contact['photo'],
             "phone": contact['phone'],
             "phoneNorm": contact['phoneNorm'],
-            "email" : contact['email']
+            "email": contact['email']
           });
         }
       });
@@ -370,6 +371,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 submitText: 'Call',
                 title: const Text("Make Call"));
           } else {
+            Navigator.pop(context);
             _makeCall(phoneNumber);
           }
         },
@@ -382,9 +384,22 @@ class _ContactsPageState extends State<ContactsPage> {
             backgroundColor:
                 MaterialStateProperty.all(ColorsPlus.secondaryColor)),
         onPressed: () {
+          Navigator.pop(context);
           _createSMS(phoneNumber);
         },
         child: Icon(Icons.sms, color: ColorsPlus.primaryColor));
+  }
+
+  ElevatedButton _sendEmailBTN({required String email}) {
+    return ElevatedButton(
+        style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+        onPressed: () {
+          Navigator.pop(context);
+          _sendEmail(email);
+        },
+        child: Icon(Icons.email, color: ColorsPlus.primaryColor));
   }
 
   void _makeCall(String contactNumber) async {
@@ -393,6 +408,19 @@ class _ContactsPageState extends State<ContactsPage> {
 
   void _createSMS(String contactNumber) {
     launchUrlString('sms:$contactNumber');
+  }
+
+  void _sendEmail(String email) {
+    if (email != "") {
+      launchUrlString('mailto:$email');
+    }
+    Fluttertoast.showToast(
+        msg: "No email found.",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: ColorsPlus.secondaryColor,
+        textColor: ColorsPlus.primaryColor,
+        fontSize: 16.0);
   }
 
   @override
