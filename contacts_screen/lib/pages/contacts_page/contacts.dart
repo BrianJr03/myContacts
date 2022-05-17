@@ -190,7 +190,7 @@ class _ContactsPageState extends State<ContactsPage> {
     );
   }
 
-  SliverGroupedListView _contactList(List<dynamic> contactList) {
+  SliverGroupedListView _contactList(List<Map> contactList) {
     return SliverGroupedListView<dynamic, String>(
       elements: contactList,
       groupBy: (contact) => contact['name'][0],
