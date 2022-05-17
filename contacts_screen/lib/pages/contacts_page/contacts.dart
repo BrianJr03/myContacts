@@ -7,6 +7,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class ContactsPage extends StatefulWidget {
@@ -32,6 +33,7 @@ class _ContactsPageState extends State<ContactsPage> {
   void initState() {
     super.initState();
     _getContacts();
+    _getMyNameAndInfo();
   }
 
   @override
@@ -118,6 +120,7 @@ class _ContactsPageState extends State<ContactsPage> {
                         _myNameStr = _myNameContr.text.trim();
                         _myInfoStr = _myInfoContr.text.trim();
                       });
+                      _saveMyNameAndInfo();
                     } else {
                       Fluttertoast.showToast(
                           msg: "Please provide name and info",
@@ -151,6 +154,24 @@ class _ContactsPageState extends State<ContactsPage> {
         ),
       ]),
     );
+  }
+
+  void _saveMyNameAndInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('myName', _myNameStr);
+    prefs.setString('myInfo', _myInfoStr);
+  }
+
+  void _getMyNameAndInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _myNameStr = prefs.getString('myName') != null
+        ? prefs.getString('myName')!
+        : "My Name";
+    _myInfoStr = prefs.getString('myInfo') != null
+        ? prefs.getString('myInfo')!
+        : "My Info";
+    _myNameContr.text = _myNameStr;
+    _myInfoContr.text = _myInfoStr;
   }
 
   InkWell _contactCard(Map contact) {
