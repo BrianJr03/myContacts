@@ -2,6 +2,8 @@
 
 A simple contacts app, built with Flutter.
 
+![alt text](https://github.com/[BrianJr03]/[reponame]/blob/[master]/app ss.jpg?raw=true)
+
 ## Features
 
 - Search Functionality
