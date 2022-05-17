@@ -1,6 +1,6 @@
 # myContacts
 
-A simple contacts app that allows a user to load their stored contacts to be displayed on screen. Built with Flutter.
+A simple contacts app, built with Flutter.
 
 ## Features
 
