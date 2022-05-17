@@ -5,7 +5,7 @@ A simple contacts app that allows a user to load their stored contacts to be dis
 ## Features
 
 - Search Functionality
-  - A user can filter through their contacts with the help of a search bar.
+  - A user can filter through their contacts via name or number with the help of a search bar.
   
 - Scrollable Contacts List with Sections
   - Each section is labled in alphabetical order.
