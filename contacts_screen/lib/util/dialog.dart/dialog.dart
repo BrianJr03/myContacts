@@ -1,5 +1,6 @@
 import '/theme/colors.dart';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 class DialogPlus {
@@ -66,6 +67,9 @@ class DialogPlus {
       TextEditingController? contr,
       Function(String)? onSubmitted}) {
     return TextField(
+      maxLength: 15,
+      maxLines: 1,
+      maxLengthEnforcement: MaxLengthEnforcement.enforced,
         onSubmitted: onSubmitted ?? (s) {},
         enabled: enabled,
         cursorColor: ColorsPlus.secondaryColor,
