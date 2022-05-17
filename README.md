@@ -35,6 +35,6 @@ Instructions for how to install Flutter SDK can be found [here](https://docs.flu
 If you have trouble running on an iOS device or emulator, ensure that you have the CocoaPods manager installed, which manages dependencies for Xcode projects. Instructions for how to install can be found [here](https://guides.cocoapods.org/using/getting-started.html). Once CocoaPods is installed, you can install the pods for this project by setting the directory to `ios` and running `pod install` (this process will run automatically when running the main method). Other CocoaPods commands can be used for troubleshooting, such as `pod outdated` and `pod update`, but only when the directory is set to `ios`. Ensure that your version of the app has been signed with an Apple account, which can be done through Xcode. A Developer account is not required to run the app, but an account must be used to sign the app.
 
 ## Issues
- - Limited iOS testing. There *may* be iOS config and other iOS-specific issues.
+ - Limited iOS testing. There *may* be iOS config and other platform-specific issues.
  - After initially approving the permission to import contacts, the app will immediately close. 
    - Re-open the app and it'll work as intended.
