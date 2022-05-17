@@ -25,7 +25,7 @@ A simple contacts app that allows a user to load their stored contacts to be dis
   - The source code for this project is cleanly written and follows best practices.
 
 ## How to Run
-This application is in development and may be prone to bugs/issues/crashes. Run application at own risk.
+This application as-is has seen limited iOS testing and there may be bugs/issues present. Run at your own risk.
 1. Install Flutter SDK and an emulator of your choice (or offload to a physical device).
 2. In your code editor, attach a running emulator or a physical device to the project.
 3. Find the root of the project in `lib/main.dart`. Run the main() method, which will run the application on your emulator or device. You can also use `flutter run` in a shell, with additional arguments to customize the configuration.
