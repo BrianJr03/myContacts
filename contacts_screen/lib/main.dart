@@ -1,8 +1,18 @@
+import 'package:flutter/services.dart';
+
 import '/pages/contacts_page/contacts.dart';
 
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+    statusBarColor: Colors.transparent,
+  ));
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -16,4 +26,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
- 
