@@ -38,3 +38,5 @@ If you have trouble running on an iOS device or emulator, ensure that you have t
  - Limited iOS testing. There *may* be iOS config and other platform-specific issues.
  - After initially approving the permission to import contacts, the app will immediately close. 
    - Re-open the app and it'll work as intended.
+
+*These issues are currently being worked on. If you find any other bugs or have suggestions, email me @* `thaballa79@gmail.com`
