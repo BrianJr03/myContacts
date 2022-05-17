@@ -370,7 +370,7 @@ class _ContactsPageState extends State<ContactsPage> {
                   cursorColor: ColorsPlus.primaryColor,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Search Contacts | Enter Phone",
+                    hintText: "Contacts | Phone #",
                     hintStyle: TextStyle(color: ColorsPlus.primaryColor),
                     suffixIcon:
                         Icon(Icons.search, color: ColorsPlus.primaryColor),
