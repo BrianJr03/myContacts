@@ -22,18 +22,34 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
+  /// The profile picture used for the user's avatar image.
   File? _pfp;
 
+  /// This represents the user's name and is displayed in [_myContactCard].
   String _myNameStr = "My Name";
+
+  /// This represents the user's info and is displayed in [_myContactCard].
   String _myInfoStr = "My Info";
 
+  /// List of the user's contacts.
   final List<Map> _contacts = [];
 
+  /// [TextEditingController] for the text field used to enter the user's name
+  ///  in the Update Info dialog.
   final _myNameContr = TextEditingController();
+
+  /// [TextEditingController] for the text field used to enter the user's info
+  ///  in the Update Info dialog.
   final _myInfoContr = TextEditingController();
+
+  /// [TextEditingController] for the text field used to enter the user's name
+  ///  search query in the search bar.
   final _searchBarContr = TextEditingController();
 
+  /// Style used for the user's name.
   TextStyle get _myNameStyle => const TextStyle(fontSize: 25);
+
+  /// Style used for the user's info.
   TextStyle get _myInfoStyle =>
       TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
 
@@ -53,6 +69,10 @@ class _ContactsPageState extends State<ContactsPage> {
     _searchBarContr.dispose();
   }
 
+  /// Fetches user's contacts.
+  ///
+  /// If the contacts permission has not been granted, the user will be
+  /// asked for approval.
   void _getContacts() async {
     if (await FlutterContacts.requestPermission()) {
       List<Contact> contacts = await FlutterContacts.getContacts(
@@ -64,13 +84,15 @@ class _ContactsPageState extends State<ContactsPage> {
             "photo": contact.photoOrThumbnail,
             "phone": contact.phones[0].number,
             "phoneNorm": contact.phones[0].normalizedNumber,
-            "email": contact.emails.isNotEmpty ? contact.emails[0].address : "N/A"
+            "email":
+                contact.emails.isNotEmpty ? contact.emails[0].address : "N/A"
           });
         }
       });
     }
   }
 
+  /// Fetches user's profile picture from local storage.
   void _getProfilePic() async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString('_pfp');
@@ -79,6 +101,7 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
+  /// Fetches user's name and info from local storage.
   void _getMyNameAndInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _myNameStr = prefs.getString('myName') != null
@@ -91,7 +114,8 @@ class _ContactsPageState extends State<ContactsPage> {
     _myInfoContr.text = _myInfoStr;
   }
 
-  Column _myInfo() {
+  /// Returns a column with user's name and info.
+  Column _myNameAndInfo() {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text(
         _myNameStr,
@@ -102,6 +126,8 @@ class _ContactsPageState extends State<ContactsPage> {
     ]);
   }
 
+  /// Shows Update Info dialog, allowing a user to change their
+  /// name, info, and photo.
   void _showUpdateInfoDialog() {
     DialogPlus.showDialogPlus(
         context: context,
@@ -115,7 +141,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 }),
                 child: _avatar(radius: 70)),
             const SizedBox(height: 20),
-            _myInfo(),
+            _myNameAndInfo(),
             const SizedBox(height: 20),
             DialogPlus.dialogTextField(
               hintText: "Edit name",
@@ -160,6 +186,9 @@ class _ContactsPageState extends State<ContactsPage> {
         cancelText: "Cancel");
   }
 
+  /// Card used to display a user's name, info, and photo.
+  ///
+  /// Must be tapped to show the Update Info dialog.
   SliverList _myContactCard() {
     return SliverList(
       delegate: SliverChildListDelegate([
@@ -177,7 +206,7 @@ class _ContactsPageState extends State<ContactsPage> {
                   const SizedBox(width: 15),
                   _avatar(radius: 25),
                   const SizedBox(width: 15),
-                  _myInfo(),
+                  _myNameAndInfo(),
                   const Spacer(),
                   Icon(Icons.edit, color: ColorsPlus.secondaryColor),
                   const SizedBox(width: 24),
@@ -190,6 +219,7 @@ class _ContactsPageState extends State<ContactsPage> {
     );
   }
 
+  /// Card used for the user's contacts.
   InkWell _contactCard(Map contact) {
     ImageProvider<Object> imageProvider =
         const AssetImage('assets/place_holder.png');
@@ -199,12 +229,12 @@ class _ContactsPageState extends State<ContactsPage> {
     return InkWell(
       onTap: (() => DialogPlus.showDialogPlus(
           context: context,
-          title: AutoSizeText.rich(DialogPlus.contactMethodText(contact)),
+          title: AutoSizeText.rich(DialogPlus.contactDialogTitle(contact)),
           content: Column(
             children: [
               _makeCallBTN(phoneNumber: contact['phone']),
               _createSmsBTN(phoneNumber: contact['phone']),
-              _sendEmailBTN(email: contact['email'])
+              _sendEmailBTN(emailAddress: contact['email'])
             ],
           ),
           onSubmitTap: () {},
@@ -228,6 +258,11 @@ class _ContactsPageState extends State<ContactsPage> {
     );
   }
 
+  /// A list of the user's contacts.
+  ///
+  /// The list is sorted alphabetically and is displayed in sections.
+  ///
+  /// Example: All contacts whose name begin with 'B' is under the 'B' section.
   SliverGroupedListView _contactList(List<Map> contactList) {
     return SliverGroupedListView<dynamic, String>(
       elements: contactList,
@@ -261,6 +296,7 @@ class _ContactsPageState extends State<ContactsPage> {
     );
   }
 
+  /// Avatar used for contact cards.
   CircleAvatar _avatar({required double radius}) {
     return CircleAvatar(
       radius: radius,
@@ -270,12 +306,15 @@ class _ContactsPageState extends State<ContactsPage> {
     );
   }
 
+  /// Saves the user's name and info to local storage.
   void _saveMyNameAndInfo() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('myName', _myNameStr);
     prefs.setString('myInfo', _myInfoStr);
   }
 
+  /// Allows the user to pick and save an image from gallery to be used as their
+  /// profile picture.
   Future _setProfilePic() async {
     final prefs = await SharedPreferences.getInstance();
     final profileImagePicker =
@@ -288,6 +327,9 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
+  /// Filters [_contactList] based on the [query].
+  ///
+  /// Contacts can be filtered by name or phone number.
   void _filterSearchResults(String query) {
     if (query.isNotEmpty) {
       List<Map> queriedContacts = [];
@@ -319,6 +361,12 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
+  /// Message displayed if a user's has searched for a contact and has no
+  /// results.
+  ///
+  /// If there are no results displayed and the user's query is a
+  /// number (between 7 - 11 in character length), buttons to call and SMS
+  /// the number will appear.
   SliverList _noMatchingContactsMSG({required String numToContact}) {
     return SliverList(
         delegate: SliverChildListDelegate([
@@ -338,6 +386,11 @@ class _ContactsPageState extends State<ContactsPage> {
     ]));
   }
 
+  /// Button that allows a user to make a call to the [phoneNumber].
+  ///
+  /// If [noMatchingContact] is true, a dialog box will appear after a button
+  /// press, allowing the user to confirm their decision to call
+  /// an unknown number.
   ElevatedButton _makeCallBTN(
       {required String phoneNumber, bool noMatchingContact = false}) {
     return ElevatedButton(
@@ -378,6 +431,7 @@ class _ContactsPageState extends State<ContactsPage> {
         child: Icon(Icons.call, color: ColorsPlus.primaryColor));
   }
 
+  /// Button that allows a user to make a SMS to the [phoneNumber].
   ElevatedButton _createSmsBTN({required String phoneNumber}) {
     return ElevatedButton(
         style: ButtonStyle(
@@ -390,29 +444,38 @@ class _ContactsPageState extends State<ContactsPage> {
         child: Icon(Icons.sms, color: ColorsPlus.primaryColor));
   }
 
-  ElevatedButton _sendEmailBTN({required String email}) {
+  /// Button that allows a user to make a email to the [emailAddress].
+  ElevatedButton _sendEmailBTN({required String emailAddress}) {
     return ElevatedButton(
         style: ButtonStyle(
             backgroundColor:
                 MaterialStateProperty.all(ColorsPlus.secondaryColor)),
         onPressed: () {
           Navigator.pop(context);
-          _sendEmail(email);
+          _sendEmail(emailAddress);
         },
         child: Icon(Icons.email, color: ColorsPlus.primaryColor));
   }
 
+  /// Calls [contactNumber]. This is a direct call and starts immediately.
   void _makeCall(String contactNumber) async {
     await FlutterPhoneDirectCaller.callNumber(contactNumber);
   }
 
+  /// Launches the default SMS app, opening the conversation with 
+  /// [contactNumber].
   void _createSMS(String contactNumber) {
     launchUrlString('sms:$contactNumber');
   }
 
-  void _sendEmail(String email) {
-    if (email != "N/A") {
-      launchUrlString('mailto:$email');
+  /// Launches the default email app, opening the email to 
+  /// [emailAddress]. 
+  /// 
+  /// If the contact's [emailAddress] is not found, a toast warning will be 
+  /// displayed.
+  void _sendEmail(String emailAddress) {
+    if (emailAddress != "N/A") {
+      launchUrlString('mailto:$emailAddress');
     }
     Fluttertoast.showToast(
         msg: "No email found for this contact",

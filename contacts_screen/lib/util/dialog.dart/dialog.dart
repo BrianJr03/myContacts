@@ -11,9 +11,11 @@ class DialogPlus {
   ///
   /// [onSubmitTap] is executed when a user confirms their action.
   /// The dialog is closed before any other code is executed.
+  /// If null, a button will not be present.
   ///
   /// [onCancelTap] is executed when a user cancels their action.
   /// The dialog is closed before any other code is executed.
+  /// If null, a button will not be present.
   ///
   /// [submitText] is displayed as a button to confirm action. Ex: 'OK'
   ///
@@ -105,12 +107,9 @@ class DialogPlus {
                 ))));
   }
 
-  /// Returns 'How would you like to contact ... ?'
-  ///
-  /// where '...' represents the given contact's name.
-  ///
-  /// Example: 'How would you like to contact Jerry ?'
-  static TextSpan contactMethodText(Map contact) {
+  /// This is used as the title of the dialog that appears when a user taps a
+  /// contacts's card.
+  static TextSpan contactDialogTitle(Map contact) {
     return TextSpan(text: 'Contact ', children: <InlineSpan>[
       TextSpan(
           text: contact['name'].toString().trim(),

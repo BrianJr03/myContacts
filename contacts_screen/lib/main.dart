@@ -11,6 +11,7 @@ void main() {
     dev.log("This app is only intended for iOS and Android");
     exit(1);
   }
+  // Locks app into portrait mode
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
