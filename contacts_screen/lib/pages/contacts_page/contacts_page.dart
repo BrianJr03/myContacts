@@ -214,10 +214,6 @@ class _ContactsPageState extends State<ContactsPage> {
                     onTap: (() => _showUpdateInfoDialog()),
                     child: _myNameAndInfo()),
                 const Spacer(),
-                InkWell(
-                    onTap: () => _showUpdateInfoDialog(),
-                    child: Icon(Icons.edit, color: ColorsPlus.secondaryColor)),
-                const SizedBox(width: 24),
                 _isDialerShown
                     ? InkWell(
                         onTap: () {
@@ -233,7 +229,7 @@ class _ContactsPageState extends State<ContactsPage> {
                         },
                         child: Icon(Icons.toggle_off,
                             color: ColorsPlus.secondaryColor)),
-                const SizedBox(width: 10)
+                const SizedBox(width: 26),
               ],
             ),
           ),
@@ -243,7 +239,7 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   /// Displays a dialer for easier number entry.
-  /// 
+  ///
   /// Can be toggled via [_myContactCard].
   SliverList _dialer() {
     return SliverList(
