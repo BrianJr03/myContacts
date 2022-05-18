@@ -53,6 +53,8 @@ class _ContactsPageState extends State<ContactsPage> {
   TextStyle get _myInfoStyle =>
       TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
 
+  bool _isDialerShown = false;
+
   @override
   void initState() {
     super.initState();
@@ -186,6 +188,119 @@ class _ContactsPageState extends State<ContactsPage> {
         cancelText: "Cancel");
   }
 
+  SliverList _dialer() {
+    return SliverList(
+        delegate: SliverChildListDelegate([
+      const SizedBox(height: 15),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("1")),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("2")),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("3"))
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("4")),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("5")),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("6"))
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("7")),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("8")),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("9"))
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Icon(Icons.call)),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Text("0")),
+              const SizedBox(width: 35),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () {},
+                  child: const Icon(Icons.backspace))
+            ],
+          ),
+          const SizedBox(height: 15),
+        ],
+      )
+    ]));
+  }
+
   /// Card used to display a user's name, info, and photo.
   ///
   /// Must be tapped to show the Update Info dialog.
@@ -194,24 +309,33 @@ class _ContactsPageState extends State<ContactsPage> {
       delegate: SliverChildListDelegate([
         SizedBox(
           height: 100,
-          child: InkWell(
-            onTap: () {
-              _showUpdateInfoDialog();
-            },
-            child: Card(
-              elevation: 5.0,
-              shadowColor: ColorsPlus.secondaryColor,
-              child: Row(
-                children: [
-                  const SizedBox(width: 15),
-                  _avatar(radius: 25),
-                  const SizedBox(width: 15),
-                  _myNameAndInfo(),
-                  const Spacer(),
-                  Icon(Icons.edit, color: ColorsPlus.secondaryColor),
-                  const SizedBox(width: 24),
-                ],
-              ),
+          child: Card(
+            elevation: 5.0,
+            shadowColor: ColorsPlus.secondaryColor,
+            child: Row(
+              children: [
+                const SizedBox(width: 15),
+                _avatar(radius: 25),
+                const SizedBox(width: 15),
+                InkWell(
+                    onTap: (() => _showUpdateInfoDialog()),
+                    child: _myNameAndInfo()),
+                const Spacer(),
+                InkWell(
+                    onTap: () => _showUpdateInfoDialog(),
+                    child: Icon(Icons.edit, color: ColorsPlus.secondaryColor)),
+                const SizedBox(width: 24),
+                _isDialerShown
+                    ? InkWell(
+                        onTap: () => setState((() => _isDialerShown = false)),
+                        child: Icon(Icons.toggle_on,
+                            color: ColorsPlus.secondaryColor))
+                    : InkWell(
+                        onTap: () => setState((() => _isDialerShown = true)),
+                        child: Icon(Icons.toggle_off,
+                            color: ColorsPlus.secondaryColor)),
+                const SizedBox(width: 10)
+              ],
             ),
           ),
         ),
@@ -462,16 +586,16 @@ class _ContactsPageState extends State<ContactsPage> {
     await FlutterPhoneDirectCaller.callNumber(contactNumber);
   }
 
-  /// Launches the default SMS app, opening the conversation with 
+  /// Launches the default SMS app, opening the conversation with
   /// [contactNumber].
   void _createSMS(String contactNumber) {
     launchUrlString('sms:$contactNumber');
   }
 
-  /// Launches the default email app, opening the email to 
-  /// [emailAddress]. 
-  /// 
-  /// If the contact's [emailAddress] is not found, a toast warning will be 
+  /// Launches the default email app, opening the email to
+  /// [emailAddress].
+  ///
+  /// If the contact's [emailAddress] is not found, a toast warning will be
   /// displayed.
   void _sendEmail(String emailAddress) {
     if (emailAddress != "N/A") {
@@ -521,6 +645,7 @@ class _ContactsPageState extends State<ContactsPage> {
                   },
                 )),
             _myContactCard(),
+            if (_isDialerShown) _dialer(),
             _contacts.isNotEmpty
                 ? _contactList(_contacts)
                 : _noMatchingContactsMSG(numToContact: _searchBarContr.text)
