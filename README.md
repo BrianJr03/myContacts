@@ -23,6 +23,7 @@ A simple contacts app, built with Flutter.
 - ### Phone Calls / SMS / Email
   - After clicking on a contact card, the user can reach the contact either via direct `phone call`, `SMS` or `email`.
   - If there are no matching contacts after search, a user can Call or SMS the query if it's a phone number.
+  - A dial pad can be toggled to make entering phone numbers easy.
   
 - ### Clean Architecture
   - The source code for this project is cleanly written and follows best practices.
