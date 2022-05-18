@@ -53,6 +53,7 @@ class _ContactsPageState extends State<ContactsPage> {
   TextStyle get _myInfoStyle =>
       TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
 
+  /// Indicates the visibility of [_dialer].
   bool _isDialerShown = false;
 
   @override
@@ -61,6 +62,9 @@ class _ContactsPageState extends State<ContactsPage> {
     _getContacts();
     _getProfilePic();
     _getMyNameAndInfo();
+    _searchBarContr.addListener(() {
+      _filterSearchResults(_searchBarContr.text);
+    });
   }
 
   @override
@@ -188,119 +192,6 @@ class _ContactsPageState extends State<ContactsPage> {
         cancelText: "Cancel");
   }
 
-  SliverList _dialer() {
-    return SliverList(
-        delegate: SliverChildListDelegate([
-      const SizedBox(height: 15),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("1")),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("2")),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("3"))
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("4")),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("5")),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("6"))
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("7")),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("8")),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("9"))
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Icon(Icons.call)),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Text("0")),
-              const SizedBox(width: 35),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () {},
-                  child: const Icon(Icons.backspace))
-            ],
-          ),
-          const SizedBox(height: 15),
-        ],
-      )
-    ]));
-  }
-
   /// Card used to display a user's name, info, and photo.
   ///
   /// Must be tapped to show the Update Info dialog.
@@ -315,7 +206,9 @@ class _ContactsPageState extends State<ContactsPage> {
             child: Row(
               children: [
                 const SizedBox(width: 15),
-                _avatar(radius: 25),
+                InkWell(
+                    onTap: (() => _showUpdateInfoDialog()),
+                    child: _avatar(radius: 25)),
                 const SizedBox(width: 15),
                 InkWell(
                     onTap: (() => _showUpdateInfoDialog()),
@@ -327,11 +220,17 @@ class _ContactsPageState extends State<ContactsPage> {
                 const SizedBox(width: 24),
                 _isDialerShown
                     ? InkWell(
-                        onTap: () => setState((() => _isDialerShown = false)),
+                        onTap: () {
+                          setState((() => _isDialerShown = false));
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        },
                         child: Icon(Icons.toggle_on,
                             color: ColorsPlus.secondaryColor))
                     : InkWell(
-                        onTap: () => setState((() => _isDialerShown = true)),
+                        onTap: () {
+                          setState((() => _isDialerShown = true));
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        },
                         child: Icon(Icons.toggle_off,
                             color: ColorsPlus.secondaryColor)),
                 const SizedBox(width: 10)
@@ -341,6 +240,62 @@ class _ContactsPageState extends State<ContactsPage> {
         ),
       ]),
     );
+  }
+
+  /// Displays a dialer for easier number entry.
+  /// 
+  /// Can be toggled via [_myContactCard].
+  SliverList _dialer() {
+    return SliverList(
+        delegate: SliverChildListDelegate([
+      const SizedBox(height: 15),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _dialerButton("1"),
+              const SizedBox(width: 35),
+              _dialerButton("2"),
+              const SizedBox(width: 35),
+              _dialerButton("3")
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _dialerButton("4"),
+              const SizedBox(width: 35),
+              _dialerButton("5"),
+              const SizedBox(width: 35),
+              _dialerButton("6")
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _dialerButton("7"),
+              const SizedBox(width: 35),
+              _dialerButton("8"),
+              const SizedBox(width: 35),
+              _dialerButton("9")
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _makeCallBTN(phoneNumber: _searchBarContr.text),
+              const SizedBox(width: 35),
+              _dialerButton("0"),
+              const SizedBox(width: 35),
+              _dialerBackSpace()
+            ],
+          ),
+          const SizedBox(height: 15),
+        ],
+      )
+    ]));
   }
 
   /// Card used for the user's contacts.
@@ -503,7 +458,7 @@ class _ContactsPageState extends State<ContactsPage> {
           numToContact.length <= 11)
         Column(
           children: [
-            _makeCallBTN(phoneNumber: numToContact, noMatchingContact: true),
+            if (!_isDialerShown) _makeCallBTN(phoneNumber: numToContact),
             _createSmsBTN(phoneNumber: numToContact)
           ],
         )
@@ -515,14 +470,14 @@ class _ContactsPageState extends State<ContactsPage> {
   /// If [noMatchingContact] is true, a dialog box will appear after a button
   /// press, allowing the user to confirm their decision to call
   /// an unknown number.
-  ElevatedButton _makeCallBTN(
-      {required String phoneNumber, bool noMatchingContact = false}) {
+  ElevatedButton _makeCallBTN({required String phoneNumber}) {
     return ElevatedButton(
         style: ButtonStyle(
             backgroundColor:
                 MaterialStateProperty.all(ColorsPlus.secondaryColor)),
         onPressed: () {
-          if (noMatchingContact) {
+          if (int.tryParse(_searchBarContr.text) != null &&
+              _searchBarContr.text.length >= 7) {
             DialogPlus.showDialogPlus(
                 content: AutoSizeText.rich(TextSpan(
                     text: 'This will call ',
@@ -548,8 +503,13 @@ class _ContactsPageState extends State<ContactsPage> {
                 submitText: 'Call',
                 title: const Text("Make Call"));
           } else {
-            Navigator.pop(context);
-            _makeCall(phoneNumber);
+            Fluttertoast.showToast(
+                msg: "Number must be at least 7 digits",
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                backgroundColor: ColorsPlus.secondaryColor,
+                textColor: ColorsPlus.primaryColor,
+                fontSize: 16.0);
           }
         },
         child: Icon(Icons.call, color: ColorsPlus.primaryColor));
@@ -579,6 +539,34 @@ class _ContactsPageState extends State<ContactsPage> {
           _sendEmail(emailAddress);
         },
         child: Icon(Icons.email, color: ColorsPlus.primaryColor));
+  }
+
+  /// Button used in [_dialer]
+  ElevatedButton _dialerButton(String text) {
+    return ElevatedButton(
+        style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+        onPressed: () {
+          _searchBarContr.text += text;
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: Text(text));
+  }
+
+  /// Backspace button used in [_dialer]
+  ElevatedButton _dialerBackSpace() {
+    return ElevatedButton(
+        style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+        onPressed: () {
+          var str = _searchBarContr.text;
+          if (str.isNotEmpty) {
+            _searchBarContr.text = str.substring(0, str.length - 1);
+          }
+        },
+        child: const Icon(Icons.backspace));
   }
 
   /// Calls [contactNumber]. This is a direct call and starts immediately.
@@ -630,6 +618,7 @@ class _ContactsPageState extends State<ContactsPage> {
                         }),
                     child: const Icon(Icons.contacts)),
                 title: TextField(
+                  maxLines: 1,
                   controller: _searchBarContr,
                   style: TextStyle(color: ColorsPlus.primaryColor),
                   cursorColor: ColorsPlus.primaryColor,
