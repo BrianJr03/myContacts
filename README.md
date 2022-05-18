@@ -10,7 +10,7 @@ A simple contacts app, built with Flutter.
   - A user can filter through their contacts via `name` or `number` with the help of a search bar.
   
 - Scrollable Contacts List with Sections
-  - Each section of contacts is labled in `alphabetical order` by the first letter.
+  - Each section of contacts is labeled in `alphabetical order` by the first letter.
   - Example: The 'B' section has all contacts whose name begin with 'B'.
   
 - Dynamic Header
@@ -21,7 +21,7 @@ A simple contacts app, built with Flutter.
     
 - Phone Calls / SMS / Email
   - After clicking on a contact card, the user can reach the contact either via direct `phone call`, `SMS` or `email`.
-  - If there are no maching contacts after search, a user can Call or SMS the query if it's a phone number.
+  - If there are no matching contacts after search, a user can Call or SMS the query if it's a phone number.
   
 - Clean Architecture
   - The source code for this project is cleanly written and follows best practices.
