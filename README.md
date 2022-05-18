@@ -7,24 +7,24 @@ A simple contacts app, built with Flutter.
 
 ## Features
 
-- Search Functionality
+- ### Search Functionality
   - A user can filter through their contacts via `name` or `number` with the help of a search bar.
   
-- Scrollable Contacts List with Sections
+- ### Scrollable Contacts List with Sections
   - Each section of contacts is labeled in `alphabetical order` by the first letter.
   - Example: The 'B' section has all contacts whose name begin with 'B'.
   
-- Dynamic Header
+- ### Dynamic Header
   - The user's contact card is the first card to appear before the user's contact list.
   
     - This card contains a `photo`, `name` and `description` of the user. 
     - These values can be updated in the `Update Info Dialog`.
     
-- Phone Calls / SMS / Email
+- ### Phone Calls / SMS / Email
   - After clicking on a contact card, the user can reach the contact either via direct `phone call`, `SMS` or `email`.
   - If there are no matching contacts after search, a user can Call or SMS the query if it's a phone number.
   
-- Clean Architecture
+- ### Clean Architecture
   - The source code for this project is cleanly written and follows best practices.
 
 ## How to Run
