@@ -7,7 +7,7 @@ class FormatPlus {
   /// var phoneNumber2 = '1234567891';
   /// var phoneNumber3 = '1234567';
   ///
-  /// print(formatPhoneNumber(phoneNumber1)); // 1 (234) 567-8912
+  /// print(formatPhoneNumber(phoneNumber1)); // +1 (234) 567-8912
   /// print(formatPhoneNumber(phoneNumber2)); // (123) 456-7891
   /// print(formatPhoneNumber(phoneNumber3)); // 123-4567
   ///
