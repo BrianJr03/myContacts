@@ -1,6 +1,5 @@
 import 'dart:io';
 import '/theme/colors.dart';
-import '/util/format/format.dart';
 import '/util/dialog.dart/dialog.dart';
 
 import 'package:flutter/material.dart';
@@ -178,13 +177,7 @@ class _ContactsPageState extends State<ContactsPage> {
             });
             _saveMyNameAndInfo();
           } else {
-            Fluttertoast.showToast(
-                msg: "Please provide name and info",
-                toastLength: Toast.LENGTH_SHORT,
-                timeInSecForIosWeb: 1,
-                backgroundColor: ColorsPlus.secondaryColor,
-                textColor: ColorsPlus.primaryColor,
-                fontSize: 16.0);
+            _showToast("Please provide name and info");
           }
         },
         onCancelTap: () {},
@@ -281,7 +274,9 @@ class _ContactsPageState extends State<ContactsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _makeCallBTN(phoneNumber: _searchBarContr.text),
+              _makeCallBTN(
+                  phoneNumber: _searchBarContr.text,
+                  contact: _searchBarContr.text),
               const SizedBox(width: 35),
               _dialerButton("0"),
               const SizedBox(width: 35),
@@ -307,7 +302,8 @@ class _ContactsPageState extends State<ContactsPage> {
           title: AutoSizeText.rich(DialogPlus.contactDialogTitle(contact)),
           content: Column(
             children: [
-              _makeCallBTN(phoneNumber: contact['phone']),
+              _makeCallBTN(
+                  phoneNumber: contact['phone'], contact: contact['name']),
               _createSmsBTN(phoneNumber: contact['phone']),
               _sendEmailBTN(emailAddress: contact['email'])
             ],
@@ -454,7 +450,9 @@ class _ContactsPageState extends State<ContactsPage> {
           numToContact.length <= 11)
         Column(
           children: [
-            if (!_isDialerShown) _makeCallBTN(phoneNumber: numToContact),
+            if (!_isDialerShown)
+              _makeCallBTN(
+                  phoneNumber: numToContact, contact: _searchBarContr.text),
             _createSmsBTN(phoneNumber: numToContact)
           ],
         )
@@ -466,28 +464,35 @@ class _ContactsPageState extends State<ContactsPage> {
   /// If [noMatchingContact] is true, a dialog box will appear after a button
   /// press, allowing the user to confirm their decision to call
   /// an unknown number.
-  ElevatedButton _makeCallBTN({required String phoneNumber}) {
+  ElevatedButton _makeCallBTN(
+      {required String phoneNumber, required String contact}) {
     return ElevatedButton(
         style: ButtonStyle(
             backgroundColor:
                 MaterialStateProperty.all(ColorsPlus.secondaryColor)),
         onPressed: () {
-          if (int.tryParse(_searchBarContr.text) != null &&
-              _searchBarContr.text.length >= 7) {
+          if (phoneNumber.isNotEmpty) {
             DialogPlus.showDialogPlus(
                 content: AutoSizeText.rich(TextSpan(
-                    text: 'This will call ',
+                    text: 'Call ',
                     style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                     children: [
                       TextSpan(
-                          text: FormatPlus.formatPhoneNumber(phoneNumber),
+                          text: contact,
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: ColorsPlus.secondaryColor))
+                              color: ColorsPlus.secondaryColor),
+                          children: const [
+                            TextSpan(
+                              text: ' ?',
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.black),
+                            )
+                          ])
                     ])),
                 context: context,
                 onCancelTap: () {},
@@ -499,13 +504,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 submitText: 'Call',
                 title: const Text("Make Call"));
           } else {
-            Fluttertoast.showToast(
-                msg: "Number must be at least 7 digits",
-                toastLength: Toast.LENGTH_SHORT,
-                timeInSecForIosWeb: 1,
-                backgroundColor: ColorsPlus.secondaryColor,
-                textColor: ColorsPlus.primaryColor,
-                fontSize: 16.0);
+            _showToast("Phone # is empty");
           }
         },
         child: Icon(Icons.call, color: ColorsPlus.primaryColor));
@@ -585,8 +584,13 @@ class _ContactsPageState extends State<ContactsPage> {
     if (emailAddress != "N/A") {
       launchUrlString('mailto:$emailAddress');
     }
+    _showToast("No email found for this contact");
+  }
+
+  /// Shows toast message to user.
+  _showToast(String msg) {
     Fluttertoast.showToast(
-        msg: "No email found for this contact",
+        msg: msg,
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: ColorsPlus.secondaryColor,
@@ -625,9 +629,6 @@ class _ContactsPageState extends State<ContactsPage> {
                     suffixIcon:
                         Icon(Icons.search, color: ColorsPlus.primaryColor),
                   ),
-                  onChanged: (value) {
-                    _filterSearchResults(value);
-                  },
                 )),
             _myContactCard(),
             if (_isDialerShown) _dialer(),
