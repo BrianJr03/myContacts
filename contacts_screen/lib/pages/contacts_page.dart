@@ -56,12 +56,15 @@ class _ContactsPageState extends State<ContactsPage> {
 
   bool isThemeChanged = false;
 
+  String theme = "blue";
+
   @override
   void initState() {
     super.initState();
     _getContacts();
     _getProfilePic();
     _getMyNameAndInfo();
+    _getSavedTheme();
     _searchBarContr.addListener(() {
       _filterSearchResults(_searchBarContr.text);
     });
@@ -118,6 +121,16 @@ class _ContactsPageState extends State<ContactsPage> {
         : "My Info";
     _myNameContr.text = _myNameStr;
     _myInfoContr.text = _myInfoStr;
+  }
+
+  void _getSavedTheme() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var theme = prefs.getString('theme');
+    if (theme == 'pink') {
+      ColorsPlus.setSecondaryColor = Colors.pink[300]!;
+    } else {
+      ColorsPlus.setSecondaryColor = const Color(0xff53a99a);
+    }
   }
 
   /// Returns a column with user's name and info.
@@ -331,6 +344,11 @@ class _ContactsPageState extends State<ContactsPage> {
     prefs.setString('myInfo', _myInfoStr);
   }
 
+  void _saveTheme(String theme) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('theme', theme);
+  }
+
   /// Allows the user to pick and save an image from gallery to be used as their
   /// profile picture.
   Future _setProfilePic() async {
@@ -420,17 +438,20 @@ class _ContactsPageState extends State<ContactsPage> {
                 backgroundColor: ColorsPlus.secondaryColor,
                 floating: true,
                 leading: InkWell(
-                    onTap: () => setState(() {
-                          isThemeChanged = !isThemeChanged;
-                          if (isThemeChanged) {
-                            ColorsPlus.setSecondaryColor = Colors.pink[300]!;
-                          } else {
-                            ColorsPlus.setSecondaryColor =
-                                const Color(0xff53a99a);
-                          }
+                    onTap: () {
+                      isThemeChanged = !isThemeChanged;
+                      if (isThemeChanged) {
+                        setState(() =>
+                            ColorsPlus.setSecondaryColor = Colors.pink[300]!);
+                        _saveTheme('pink');
+                      } else {
+                        setState(() => ColorsPlus.setSecondaryColor =
+                            const Color(0xff53a99a));
+                        _saveTheme('blue');
+                      }
 
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        }),
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
                     child: const Icon(Icons.contacts)),
                 title: TextField(
                   maxLines: 1,
