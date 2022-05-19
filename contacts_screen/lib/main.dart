@@ -1,10 +1,9 @@
 import 'dart:io';
-
-import 'pages/contacts_page/contacts_page.dart';
+import 'dart:developer' as dev;
+import '/pages/contacts_page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:developer' as dev;
 
 void main() {
   if (!(Platform.isIOS || Platform.isAndroid)) {

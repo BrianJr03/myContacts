@@ -1,5 +1,5 @@
+import 'package:my_contacts/util/format.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_contacts/util/format/format.dart';
 
 void main() {
   group("Phone Number Format Tests", () {
