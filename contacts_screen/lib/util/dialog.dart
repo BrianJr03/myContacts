@@ -1,3 +1,5 @@
+import 'package:my_contacts/util/format.dart';
+
 import '/theme/colors.dart';
 
 import 'package:flutter/services.dart';
@@ -110,6 +112,14 @@ class DialogPlus {
   /// This is used as the title of the dialog that appears when a user taps a
   /// contacts's card.
   static TextSpan contactDialogTitle(Map contact) {
+    String num;
+    bool isPhoneNormalized = false;
+    if (contact['phoneNorm'].toString().isNotEmpty) {
+      num = contact['phoneNorm'].toString();
+      isPhoneNormalized = true;
+    } else {
+      num = contact['phone'].toString();
+    }
     return TextSpan(text: 'Contact ', children: <InlineSpan>[
       TextSpan(
           text: contact['name'].toString().trim(),
@@ -119,8 +129,9 @@ class DialogPlus {
               color: ColorsPlus.secondaryColor),
           children: [
             TextSpan(
-                text:
-                    '\nPhone: ${contact['phone'].toString()}\nEmail: ${contact['email']}')
+                text: '\nPhone: '
+                    '${FormatPlus.formatNormalizedPhoneNumber(phoneNumber: num, isPhoneNormalized: isPhoneNormalized)}'
+                    '\nEmail: ${contact['email']}')
           ])
     ]);
   }

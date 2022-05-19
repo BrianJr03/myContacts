@@ -1,3 +1,5 @@
+import 'package:my_contacts/util/format.dart';
+
 import '/util/toast.dart';
 import '/util/dialog.dart';
 import '/theme/colors.dart';
@@ -52,7 +54,8 @@ class DialerPlus {
             children: [
               makeCallBTN(
                   context: context,
-                  phoneNumber: contr.text,
+                  phoneNumber: FormatPlus.formatNormalizedPhoneNumber(
+                      phoneNumber: contr.text, isPhoneNormalized: false),
                   contact: contr.text),
               const SizedBox(width: 35),
               _dialerButton(text: "1", contr: contr),
@@ -144,7 +147,7 @@ class DialerPlus {
   }
 
   /// Button used in [showDialerPad].
-   static ElevatedButton _dialerButton(
+  static ElevatedButton _dialerButton(
       {required String text, required TextEditingController contr}) {
     return ElevatedButton(
         style: ButtonStyle(

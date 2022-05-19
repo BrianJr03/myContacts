@@ -1,32 +1,24 @@
 class FormatPlus {
-  /// Formats a string of integers into a readable phone number format.
+  /// Formats a normalized phone number into a readable string.
+  /// 
+  /// If the number is not normalized, [phoneNumber] is returned.
   ///
-  /// Example:
+  /// Note: This removes the country code.
+  ///
   /// ```dart
-  /// var phoneNumber1 = '12345678912';
-  /// var phoneNumber2 = '1234567891';
-  /// var phoneNumber3 = '1234567';
-  ///
-  /// print(formatPhoneNumber(phoneNumber1)); // +1 (234) 567-8912
-  /// print(formatPhoneNumber(phoneNumber2)); // (123) 456-7891
-  /// print(formatPhoneNumber(phoneNumber3)); // 123-4567
-  ///
+  /// var phoneNumber = '+12345678912';
+  /// print(formatNormalizedPhoneNumber(phoneNumber)); // (234) 567-8912
+  /// 
+  /// var phoneNumber = '1234567891';
+  /// print(formatNormalizedPhoneNumber(phoneNumber)); // 1234567891
   /// ```
-  static String formatPhoneNumber(String phoneNumber) {
-    String formattedPhoneNumber = "";
-    if (phoneNumber.length == 11) {
-      formattedPhoneNumber =
-          // ignore: prefer_adjacent_string_concatenation
-          "\n+${phoneNumber.substring(0, 1)} (${phoneNumber.substring(1, 4)}) " +
-              "${phoneNumber.substring(4, 7)}-${phoneNumber.substring(7, phoneNumber.length)}";
-    } else if (phoneNumber.length >= 10) {
-      // ignore: prefer_adjacent_string_concatenation
-      formattedPhoneNumber = "\n(${phoneNumber.substring(0, 3)}) " +
-          "${phoneNumber.substring(3, 6)}-${phoneNumber.substring(6, phoneNumber.length)}";
-    } else {
-      formattedPhoneNumber =
-          "${phoneNumber.substring(0, 3)}-${phoneNumber.substring(3, phoneNumber.length)}";
+  static String formatNormalizedPhoneNumber(
+      {required String phoneNumber, required bool isPhoneNormalized}) {
+    if (isPhoneNormalized) {
+      return "(${phoneNumber.substring(2, 5)}) "
+          "${phoneNumber.substring(5, 8)}"
+          "-${phoneNumber.substring(8, phoneNumber.length)}";
     }
-    return formattedPhoneNumber;
+    return phoneNumber;
   }
 }
