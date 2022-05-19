@@ -2,7 +2,7 @@ import 'dart:io';
 import '/util/toast.dart';
 import '/util/dialer.dart';
 import '/util/dialog.dart';
-import '/theme/colors.dart';
+import '../theme/colors_plus.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -51,8 +51,10 @@ class _ContactsPageState extends State<ContactsPage> {
   TextStyle get _myInfoStyle =>
       TextStyle(fontSize: 15, color: ColorsPlus.secondaryColor);
 
-  /// Indicates the visibility of [_dialer].
+  /// Indicates the visibility of dialerPad.
   bool _isDialerShown = false;
+
+  bool isThemeChanged = false;
 
   @override
   void initState() {
@@ -268,7 +270,7 @@ class _ContactsPageState extends State<ContactsPage> {
             backgroundImage: imageProvider,
           ),
           title: Text(contact['name'].toString().trim()),
-          trailing: const Icon(Icons.contact_phone, color: Color(0xff53a99a)),
+          trailing: Icon(Icons.contact_phone, color: ColorsPlus.secondaryColor),
         ),
       ),
     );
@@ -419,9 +421,14 @@ class _ContactsPageState extends State<ContactsPage> {
                 floating: true,
                 leading: InkWell(
                     onTap: () => setState(() {
-                          _searchBarContr.clear();
-                          _contacts.clear();
-                          _getContacts();
+                          isThemeChanged = !isThemeChanged;
+                          if (isThemeChanged) {
+                            ColorsPlus.setSecondaryColor = Colors.pink[300]!;
+                          } else {
+                            ColorsPlus.setSecondaryColor =
+                                const Color(0xff53a99a);
+                          }
+
                           FocusManager.instance.primaryFocus?.unfocus();
                         }),
                     child: const Icon(Icons.contacts)),
@@ -440,7 +447,8 @@ class _ContactsPageState extends State<ContactsPage> {
                 )),
             _myContactCard(),
             if (_isDialerShown)
-              DialerPlus.showDialerPad(contr: _searchBarContr, context: context),
+              DialerPlus.showDialerPad(
+                  contr: _searchBarContr, context: context),
             _contacts.isNotEmpty
                 ? _contactList(_contacts)
                 : _noMatchingContactsMSG(numToContact: _searchBarContr.text)

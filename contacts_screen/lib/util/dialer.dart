@@ -2,7 +2,7 @@ import 'package:my_contacts/util/format.dart';
 
 import '/util/toast.dart';
 import '/util/dialog.dart';
-import '/theme/colors.dart';
+import '../theme/colors_plus.dart';
 
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';

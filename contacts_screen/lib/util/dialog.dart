@@ -1,6 +1,6 @@
 import 'package:my_contacts/util/format.dart';
 
-import '/theme/colors.dart';
+import '../theme/colors_plus.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
