@@ -64,7 +64,7 @@ class _ContactsPageState extends State<ContactsPage> {
     _getContacts();
     _getProfilePic();
     _getMyNameAndInfo();
-    _getSavedTheme();
+    _setSavedTheme();
     _searchBarContr.addListener(() {
       _filterSearchResults(_searchBarContr.text);
     });
@@ -105,9 +105,11 @@ class _ContactsPageState extends State<ContactsPage> {
   void _getProfilePic() async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString('_pfp');
-    setState(() {
+    if (value != null) {
+      setState(() {
       _pfp = File(value.toString());
     });
+    }
   }
 
   /// Fetches user's name and info from local storage.
@@ -123,7 +125,7 @@ class _ContactsPageState extends State<ContactsPage> {
     _myInfoContr.text = _myInfoStr;
   }
 
-  void _getSavedTheme() async {
+  void _setSavedTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var theme = prefs.getString('theme');
     if (theme == 'pink') {
