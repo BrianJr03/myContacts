@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutter/rendering.dart';
+
 import '/util/toast.dart';
 import '/util/dialer.dart';
 import '/util/dialog.dart';
@@ -56,6 +58,8 @@ class _ContactsPageState extends State<ContactsPage> {
 
   bool isThemeChanged = false;
 
+  bool isFabVisible = true;
+
   String theme = "blue";
 
   @override
@@ -107,8 +111,8 @@ class _ContactsPageState extends State<ContactsPage> {
     final value = prefs.getString('_pfp');
     if (value != null) {
       setState(() {
-      _pfp = File(value.toString());
-    });
+        _pfp = File(value.toString());
+      });
     }
   }
 
@@ -433,49 +437,67 @@ class _ContactsPageState extends State<ContactsPage> {
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
-            body: Center(
-                child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-                backgroundColor: ColorsPlus.secondaryColor,
-                floating: true,
-                leading: InkWell(
-                    onTap: () {
-                      isThemeChanged = !isThemeChanged;
-                      if (isThemeChanged) {
-                        setState(() =>
-                            ColorsPlus.setSecondaryColor = Colors.pink[300]!);
-                        _saveTheme('pink');
-                      } else {
-                        setState(() => ColorsPlus.setSecondaryColor =
-                            const Color(0xff53a99a));
-                        _saveTheme('blue');
-                      }
+            floatingActionButton: isFabVisible
+                ? FloatingActionButton(
+                    onPressed: () {},
+                    backgroundColor: ColorsPlus.secondaryColor,
+                    child: const Icon(Icons.add),
+                  )
+                : null,
+            body: NotificationListener<UserScrollNotification>(
+              onNotification: (n) {
+                if (n.direction == ScrollDirection.forward) {
+                  if (!isFabVisible) setState(() => isFabVisible = true);
+                } else if (n.direction == ScrollDirection.reverse) {
+                  if (isFabVisible) setState(() => isFabVisible = false);
+                }
+                return true;
+              },
+              child: Center(
+                  child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                      backgroundColor: ColorsPlus.secondaryColor,
+                      floating: true,
+                      leading: InkWell(
+                          onTap: () {
+                            isThemeChanged = !isThemeChanged;
+                            if (isThemeChanged) {
+                              setState(() => ColorsPlus.setSecondaryColor =
+                                  Colors.pink[300]!);
+                              _saveTheme('pink');
+                            } else {
+                              setState(() => ColorsPlus.setSecondaryColor =
+                                  const Color(0xff53a99a));
+                              _saveTheme('blue');
+                            }
 
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                    child: const Icon(Icons.contacts)),
-                title: TextField(
-                  maxLines: 1,
-                  controller: _searchBarContr,
-                  style: TextStyle(color: ColorsPlus.primaryColor),
-                  cursorColor: ColorsPlus.primaryColor,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Contacts | Phone #",
-                    hintStyle: TextStyle(color: ColorsPlus.primaryColor),
-                    suffixIcon:
-                        Icon(Icons.search, color: ColorsPlus.primaryColor),
-                  ),
-                )),
-            _myContactCard(),
-            if (_isDialerShown)
-              DialerPlus.showDialerPad(
-                  contr: _searchBarContr, context: context),
-            _contacts.isNotEmpty
-                ? _contactList(_contacts)
-                : _noMatchingContactsMSG(numToContact: _searchBarContr.text)
-          ],
-        ))));
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                          child: const Icon(Icons.contacts)),
+                      title: TextField(
+                        maxLines: 1,
+                        controller: _searchBarContr,
+                        style: TextStyle(color: ColorsPlus.primaryColor),
+                        cursorColor: ColorsPlus.primaryColor,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Contacts | Phone #",
+                          hintStyle: TextStyle(color: ColorsPlus.primaryColor),
+                          suffixIcon: Icon(Icons.search,
+                              color: ColorsPlus.primaryColor),
+                        ),
+                      )),
+                  _myContactCard(),
+                  if (_isDialerShown)
+                    DialerPlus.showDialerPad(
+                        contr: _searchBarContr, context: context),
+                  _contacts.isNotEmpty
+                      ? _contactList(_contacts)
+                      : _noMatchingContactsMSG(
+                          numToContact: _searchBarContr.text)
+                ],
+              )),
+            )));
   }
 }
