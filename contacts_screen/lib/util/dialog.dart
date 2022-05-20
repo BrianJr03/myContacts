@@ -120,9 +120,9 @@ class DialogPlus {
     } else {
       num = contact['phone'].toString();
     }
-    return TextSpan(text: 'Contact ', children: <InlineSpan>[
+    return TextSpan(text: 'Contact\n', children: <InlineSpan>[
       TextSpan(
-          text: contact['name'].toString().trim(),
+          text: "Name: ${contact['name'].toString().trim()}",
           style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
