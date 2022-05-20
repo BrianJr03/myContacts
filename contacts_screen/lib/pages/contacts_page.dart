@@ -56,10 +56,13 @@ class _ContactsPageState extends State<ContactsPage> {
   /// Indicates the visibility of dialerPad.
   bool _isDialerShown = false;
 
+  /// Indicates if the user has toggled their theme.
   bool isThemeChanged = false;
 
+  /// Indicates if the FAB is visible.
   bool isFabVisible = true;
 
+  /// Represents the current theme color.
   String theme = "blue";
 
   @override
@@ -93,12 +96,14 @@ class _ContactsPageState extends State<ContactsPage> {
       setState(() {
         for (var contact in contacts) {
           _contacts.add({
+            "id": contact.id,
             "name": "${contact.name.first} ${contact.name.last}",
             "photo": contact.photoOrThumbnail,
             "phone": contact.phones[0].number,
             "phoneNorm": contact.phones[0].normalizedNumber,
             "email":
-                contact.emails.isNotEmpty ? contact.emails[0].address : "N/A"
+                contact.emails.isNotEmpty ? contact.emails[0].address : "N/A",
+            "obj": contact
           });
         }
       });
@@ -127,16 +132,6 @@ class _ContactsPageState extends State<ContactsPage> {
         : "My Info";
     _myNameContr.text = _myNameStr;
     _myInfoContr.text = _myInfoStr;
-  }
-
-  void _setSavedTheme() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var theme = prefs.getString('theme');
-    if (theme == 'pink') {
-      ColorsPlus.setSecondaryColor = Colors.pink[300]!;
-    } else {
-      ColorsPlus.setSecondaryColor = const Color(0xff53a99a);
-    }
   }
 
   /// Returns a column with user's name and info.
@@ -259,6 +254,41 @@ class _ContactsPageState extends State<ContactsPage> {
       imageProvider = MemoryImage(contact['photo']);
     }
     return InkWell(
+      onLongPress: () => DialogPlus.showDialogPlus(
+          context: context,
+          title: const Text("Delete Contact"),
+          content: AutoSizeText.rich(TextSpan(
+              text: 'Are you sure you want to delete',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              children: [
+                TextSpan(
+                    text: " ${contact['name']}",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: ColorsPlus.secondaryColor),
+                    children: const [
+                      TextSpan(
+                          text: "?",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black))
+                    ]),
+              ])),
+          onSubmitTap: () async {
+            await contact['obj'].delete();
+            setState(() {
+              _contacts.clear();
+              _getContacts();
+            });
+          },
+          onCancelTap: () {},
+          submitText: "Delete",
+          cancelText: "Back"),
       onTap: (() => DialogPlus.showDialogPlus(
           context: context,
           title: AutoSizeText.rich(DialogPlus.contactDialogTitle(contact)),
@@ -271,7 +301,23 @@ class _ContactsPageState extends State<ContactsPage> {
               DialerPlus.createSmsBTN(
                   context: context, phoneNumber: contact['phone']),
               DialerPlus.sendEmailBTN(
-                  context: context, emailAddress: contact['email'])
+                  context: context, emailAddress: contact['email']),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    var result =
+                        await FlutterContacts.openExternalEdit(contact['id']);
+                    if (result != null) {
+                      setState(() {
+                        _contacts.clear();
+                        _getContacts();
+                      });
+                    }
+                  },
+                  child: const Icon(Icons.edit))
             ],
           ),
           onSubmitTap: () {},
@@ -350,6 +396,18 @@ class _ContactsPageState extends State<ContactsPage> {
     prefs.setString('myInfo', _myInfoStr);
   }
 
+  /// Fetches user's stored theme and applies it.
+  void _setSavedTheme() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var theme = prefs.getString('theme');
+    if (theme == 'pink') {
+      ColorsPlus.setSecondaryColor = Colors.pink[300]!;
+    } else {
+      ColorsPlus.setSecondaryColor = const Color(0xff53a99a);
+    }
+  }
+
+  /// Saves user's selected theme to local storage.
   void _saveTheme(String theme) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('theme', theme);
@@ -386,6 +444,7 @@ class _ContactsPageState extends State<ContactsPage> {
         _contacts.clear();
         for (var contact in queriedContacts) {
           _contacts.add({
+            "id": contact['id'],
             "name": contact['name'],
             "photo": contact['photo'],
             "phone": contact['phone'],
@@ -439,7 +498,15 @@ class _ContactsPageState extends State<ContactsPage> {
         child: Scaffold(
             floatingActionButton: isFabVisible
                 ? FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var result = await FlutterContacts.openExternalInsert();
+                      if (result != null) {
+                        setState(() {
+                          _contacts.clear();
+                          _getContacts();
+                        });
+                      }
+                    },
                     backgroundColor: ColorsPlus.secondaryColor,
                     child: const Icon(Icons.add),
                   )
