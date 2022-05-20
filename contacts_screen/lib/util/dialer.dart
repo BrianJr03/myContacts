@@ -58,7 +58,7 @@ class DialerPlus {
                       phoneNumber: contr.text, isPhoneNormalized: false),
                   contact: contr.text),
               const SizedBox(width: 35),
-              _dialerButton(text: "1", contr: contr),
+              _dialerButton(text: "0", contr: contr),
               const SizedBox(width: 35),
               _dialerBackSpace(contr: contr)
             ],
