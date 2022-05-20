@@ -173,6 +173,9 @@ class DialerPlus {
             contr.text = str.substring(0, str.length - 1);
           }
         },
+        onLongPress: () {
+          contr.text = '';
+        },
         child: const Icon(Icons.backspace));
   }
 
