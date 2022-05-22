@@ -91,9 +91,11 @@ class _ContactsPageState extends State<ContactsPage> {
   /// asked for approval.
   void _getContacts() async {
     if (await FlutterContacts.requestPermission()) {
-      setState(() async {
-        myContacts = await FlutterContacts.getContacts(
-          withPhoto: true, withProperties: true);
+      await FlutterContacts.getContacts(withPhoto: true, withProperties: true)
+          .then((value) {
+        setState(() {
+          myContacts = value;
+        });
       });
     }
   }
