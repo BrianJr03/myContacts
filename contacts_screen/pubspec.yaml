@@ -30,7 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  grouped_list: ^4.2.0
+  grouped_list: ^5.0.1
   flutter_contacts: ^1.1.4
   url_launcher: ^6.1.2
 
