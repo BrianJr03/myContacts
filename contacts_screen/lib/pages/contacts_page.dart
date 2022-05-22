@@ -91,21 +91,9 @@ class _ContactsPageState extends State<ContactsPage> {
   /// asked for approval.
   void _getContacts() async {
     if (await FlutterContacts.requestPermission()) {
-      myContacts = await FlutterContacts.getContacts(
+      setState(() async {
+        myContacts = await FlutterContacts.getContacts(
           withPhoto: true, withProperties: true);
-      setState(() {
-        for (var contact in myContacts) {
-          // _contacts.add({
-          //   "id": contact.id,
-          //   "name": "${contact.name.first} ${contact.name.last}",
-          //   "photo": contact.photoOrThumbnail,
-          //   "phone": contact.phones[0].number,
-          //   "phoneNorm": contact.phones[0].normalizedNumber,
-          //   "email":
-          //       contact.emails.isNotEmpty ? contact.emails[0].address : "N/A",
-          //   "obj": contact
-          // });
-        }
       });
     }
   }
