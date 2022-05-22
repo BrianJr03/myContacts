@@ -32,7 +32,7 @@ class _ContactsPageState extends State<ContactsPage> {
   String _myInfoStr = "My Info";
 
   /// List of the user's contacts.
-  final List<Map> _contacts = [];
+  List<Contact> myContacts = [];
 
   /// [TextEditingController] for the text field used to enter the user's name
   ///  in the Update Info dialog.
@@ -91,20 +91,20 @@ class _ContactsPageState extends State<ContactsPage> {
   /// asked for approval.
   void _getContacts() async {
     if (await FlutterContacts.requestPermission()) {
-      List<Contact> contacts = await FlutterContacts.getContacts(
+      myContacts = await FlutterContacts.getContacts(
           withPhoto: true, withProperties: true);
       setState(() {
-        for (var contact in contacts) {
-          _contacts.add({
-            "id": contact.id,
-            "name": "${contact.name.first} ${contact.name.last}",
-            "photo": contact.photoOrThumbnail,
-            "phone": contact.phones[0].number,
-            "phoneNorm": contact.phones[0].normalizedNumber,
-            "email":
-                contact.emails.isNotEmpty ? contact.emails[0].address : "N/A",
-            "obj": contact
-          });
+        for (var contact in myContacts) {
+          // _contacts.add({
+          //   "id": contact.id,
+          //   "name": "${contact.name.first} ${contact.name.last}",
+          //   "photo": contact.photoOrThumbnail,
+          //   "phone": contact.phones[0].number,
+          //   "phoneNorm": contact.phones[0].normalizedNumber,
+          //   "email":
+          //       contact.emails.isNotEmpty ? contact.emails[0].address : "N/A",
+          //   "obj": contact
+          // });
         }
       });
     }
@@ -247,11 +247,11 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   /// Card used for the user's contacts.
-  InkWell _contactCard(Map contact) {
+  InkWell _contactCard(Contact contact) {
     ImageProvider<Object> imageProvider =
         const AssetImage('assets/place_holder.png');
-    if (contact['photo'] != null) {
-      imageProvider = MemoryImage(contact['photo']);
+    if (contact.photoOrThumbnail != null) {
+      imageProvider = MemoryImage(contact.photoOrThumbnail!);
     }
     return InkWell(
       onLongPress: () => DialogPlus.showDialogPlus(
@@ -265,7 +265,7 @@ class _ContactsPageState extends State<ContactsPage> {
               ),
               children: [
                 TextSpan(
-                    text: " ${contact['name']}",
+                    text: "${contact.name.first} ${contact.name.last}",
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -280,9 +280,9 @@ class _ContactsPageState extends State<ContactsPage> {
                     ]),
               ])),
           onSubmitTap: () async {
-            await contact['obj'].delete();
+            await contact.delete();
             setState(() {
-              _contacts.clear();
+              myContacts.clear();
               _getContacts();
             });
           },
@@ -296,12 +296,15 @@ class _ContactsPageState extends State<ContactsPage> {
             children: [
               DialerPlus.makeCallBTN(
                   context: context,
-                  phoneNumber: contact['phone'],
-                  contact: contact['name']),
+                  phoneNumber: contact.phones[0].number,
+                  contact: "${contact.name.first} ${contact.name.last}"),
               DialerPlus.createSmsBTN(
-                  context: context, phoneNumber: contact['phone']),
+                  context: context, phoneNumber: contact.phones[0].number),
               DialerPlus.sendEmailBTN(
-                  context: context, emailAddress: contact['email']),
+                  context: context,
+                  emailAddress: contact.emails.isNotEmpty
+                      ? contact.emails[0].address
+                      : "N/A"),
               ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:
@@ -309,10 +312,10 @@ class _ContactsPageState extends State<ContactsPage> {
                   onPressed: () async {
                     Navigator.pop(context);
                     var result =
-                        await FlutterContacts.openExternalEdit(contact['id']);
+                        await FlutterContacts.openExternalEdit(contact.id);
                     if (result != null) {
                       setState(() {
-                        _contacts.clear();
+                        myContacts.clear();
                         _getContacts();
                       });
                     }
@@ -334,7 +337,8 @@ class _ContactsPageState extends State<ContactsPage> {
             radius: 15,
             backgroundImage: imageProvider,
           ),
-          title: Text(contact['name'].toString().trim()),
+          title:
+              Text("${contact.name.first.trim()} ${contact.name.last.trim()}"),
           trailing: Icon(Icons.contact_phone, color: ColorsPlus.secondaryColor),
         ),
       ),
@@ -346,12 +350,13 @@ class _ContactsPageState extends State<ContactsPage> {
   /// The list is sorted alphabetically and is displayed in sections.
   ///
   /// Example: All contacts whose name begin with 'B' is under the 'B' section.
-  SliverGroupedListView _contactList(List<Map> contactList) {
+  SliverGroupedListView _contactList(List<Contact> contactList) {
     return SliverGroupedListView<dynamic, String>(
       elements: contactList,
-      groupBy: (contact) => contact['name'][0],
+      groupBy: (contact) => contact.name.first.toString()[0],
       groupComparator: (value1, value2) => value2.compareTo(value1),
-      itemComparator: (item1, item2) => item2['name'].compareTo(item1['name']),
+      itemComparator: (item1, item2) =>
+          item2.name.toString().compareTo(item1.name.toString()),
       order: GroupedListOrder.DESC,
       groupSeparatorBuilder: (String value) => Padding(
         padding: const EdgeInsets.all(8.0),
@@ -432,31 +437,29 @@ class _ContactsPageState extends State<ContactsPage> {
   /// Contacts can be filtered by name or phone number.
   void _filterSearchResults(String query) {
     if (query.isNotEmpty) {
-      List<Map> queriedContacts = [];
-      for (var contact in _contacts) {
-        if (contact['name'].toLowerCase().contains(query.toLowerCase())) {
+      List<Contact> queriedContacts = [];
+      for (var contact in myContacts) {
+        if ("${contact.name.first} ${contact.name.last}"
+            .toString()
+            .toLowerCase()
+            .contains(query.toLowerCase())) {
           queriedContacts.add(contact);
-        } else if (contact['phoneNorm'].toString().contains(query)) {
+        } else if (contact.phones[0].normalizedNumber
+            .toString()
+            .contains(query)) {
           queriedContacts.add(contact);
         }
       }
       setState(() {
-        _contacts.clear();
+        myContacts.clear();
         for (var contact in queriedContacts) {
-          _contacts.add({
-            "id": contact['id'],
-            "name": contact['name'],
-            "photo": contact['photo'],
-            "phone": contact['phone'],
-            "phoneNorm": contact['phoneNorm'],
-            "email": contact['email']
-          });
+          myContacts.add(contact);
         }
       });
       return;
     } else {
       setState(() {
-        _contacts.clear();
+        myContacts.clear();
         _getContacts();
       });
     }
@@ -499,13 +502,11 @@ class _ContactsPageState extends State<ContactsPage> {
             floatingActionButton: isFabVisible
                 ? FloatingActionButton(
                     onPressed: () async {
-                      var result = await FlutterContacts.openExternalInsert();
-                      if (result != null) {
-                        setState(() {
-                          _contacts.clear();
-                          _getContacts();
-                        });
-                      }
+                      await FlutterContacts.openExternalInsert();
+                      setState(() {
+                        myContacts.clear();
+                        _getContacts();
+                      });
                     },
                     backgroundColor: ColorsPlus.secondaryColor,
                     child: const Icon(Icons.add),
@@ -559,8 +560,8 @@ class _ContactsPageState extends State<ContactsPage> {
                   if (_isDialerShown)
                     DialerPlus.showDialerPad(
                         contr: _searchBarContr, context: context),
-                  _contacts.isNotEmpty
-                      ? _contactList(_contacts)
+                  myContacts.isNotEmpty
+                      ? _contactList(myContacts)
                       : _noMatchingContactsMSG(
                           numToContact: _searchBarContr.text)
                 ],
