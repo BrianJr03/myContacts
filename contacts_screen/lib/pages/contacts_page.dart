@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/rendering.dart';
 
 import '/util/toast.dart';
 import '/util/dialer.dart';
@@ -7,12 +6,14 @@ import '/util/dialog.dart';
 import '../theme/colors_plus.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({Key? key}) : super(key: key);
@@ -61,9 +62,6 @@ class _ContactsPageState extends State<ContactsPage> {
 
   /// Indicates if the FAB is visible.
   bool isFabVisible = true;
-
-  /// Represents the current theme color.
-  String theme = "blue";
 
   @override
   void initState() {
@@ -162,16 +160,6 @@ class _ContactsPageState extends State<ContactsPage> {
               hintText: "Edit info",
               contr: _myInfoContr,
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _setProfilePic();
-                },
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                child: const Text("Change Photo"))
           ],
         ),
         onSubmitTap: () {
@@ -190,9 +178,109 @@ class _ContactsPageState extends State<ContactsPage> {
         cancelText: "Cancel");
   }
 
+  /// Shows Update Info dialog, allowing a user to delete a selected
+  /// contact.
+  void _showDeleteContactDialog(Contact contact) {
+    DialogPlus.showDialogPlus(
+        context: context,
+        title: const Text("Delete Contact"),
+        content: AutoSizeText.rich(TextSpan(
+            text: 'Are you sure you want to delete',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+            children: [
+              TextSpan(
+                  text: "${contact.name.first} ${contact.name.last}",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: ColorsPlus.secondaryColor),
+                  children: const [
+                    TextSpan(
+                        text: "?",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black))
+                  ]),
+            ])),
+        onSubmitTap: () async {
+          await contact.delete();
+          setState(() {
+            myContacts.clear();
+            _getContacts();
+          });
+        },
+        onCancelTap: () {},
+        submitText: "Delete",
+        cancelText: "Back");
+  }
+
+  /// This is show when a contact card is pressed.
+  void _showContactInfoDialog(Contact contact) {
+    DialogPlus.showDialogPlus(
+        context: context,
+        title: AutoSizeText.rich(DialogPlus.contactDialogTitle(contact)),
+        content: Column(
+          children: [
+            DialerPlus.makeCallBTN(
+                context: context,
+                phoneNumber: contact.phones[0].number,
+                contact: "${contact.name.first} ${contact.name.last}"),
+            DialerPlus.createSmsBTN(
+                context: context, phoneNumber: contact.phones[0].number),
+            DialerPlus.sendEmailBTN(
+                context: context,
+                emailAddress: contact.emails.isNotEmpty
+                    ? contact.emails[0].address
+                    : "N/A"),
+            ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(ColorsPlus.secondaryColor)),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  var result =
+                      await FlutterContacts.openExternalEdit(contact.id);
+                  if (result != null) {
+                    setState(() {
+                      myContacts.clear();
+                      _getContacts();
+                    });
+                  }
+                },
+                child: const Icon(Icons.edit))
+          ],
+        ),
+        onSubmitTap: () {},
+        onCancelTap: null,
+        submitText: 'Back',
+        cancelText: '');
+  }
+
+  /// Shows a color picker, allowing a user to change their app's theme.
+  void _showColorPickerDialog() {
+    DialogPlus.showDialogPlus(
+        context: context,
+        title: const Text("Pick Theme Color"),
+        content: ColorPicker(
+            enableAlpha: false,
+            labelTypes: const [],
+            pickerColor: ColorsPlus.secondaryColor,
+            onColorChanged: (color) => setState(() {
+                  ColorsPlus.setSecondaryColor = color;
+                })),
+        onSubmitTap: () {
+          _saveTheme(ColorsPlus.secondaryColor.value);
+        },
+        onCancelTap: null,
+        submitText: "Save",
+        cancelText: "");
+  }
+
   /// Card used to display a user's name, info, and photo.
-  ///
-  /// Must be tapped to show the Update Info dialog.
   SliverList _myContactCard() {
     return SliverList(
       delegate: SliverChildListDelegate([
@@ -244,79 +332,8 @@ class _ContactsPageState extends State<ContactsPage> {
       imageProvider = MemoryImage(contact.photoOrThumbnail!);
     }
     return InkWell(
-      onLongPress: () => DialogPlus.showDialogPlus(
-          context: context,
-          title: const Text("Delete Contact"),
-          content: AutoSizeText.rich(TextSpan(
-              text: 'Are you sure you want to delete',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              children: [
-                TextSpan(
-                    text: "${contact.name.first} ${contact.name.last}",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: ColorsPlus.secondaryColor),
-                    children: const [
-                      TextSpan(
-                          text: "?",
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black))
-                    ]),
-              ])),
-          onSubmitTap: () async {
-            await contact.delete();
-            setState(() {
-              myContacts.clear();
-              _getContacts();
-            });
-          },
-          onCancelTap: () {},
-          submitText: "Delete",
-          cancelText: "Back"),
-      onTap: (() => DialogPlus.showDialogPlus(
-          context: context,
-          title: AutoSizeText.rich(DialogPlus.contactDialogTitle(contact)),
-          content: Column(
-            children: [
-              DialerPlus.makeCallBTN(
-                  context: context,
-                  phoneNumber: contact.phones[0].number,
-                  contact: "${contact.name.first} ${contact.name.last}"),
-              DialerPlus.createSmsBTN(
-                  context: context, phoneNumber: contact.phones[0].number),
-              DialerPlus.sendEmailBTN(
-                  context: context,
-                  emailAddress: contact.emails.isNotEmpty
-                      ? contact.emails[0].address
-                      : "N/A"),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorsPlus.secondaryColor)),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    var result =
-                        await FlutterContacts.openExternalEdit(contact.id);
-                    if (result != null) {
-                      setState(() {
-                        myContacts.clear();
-                        _getContacts();
-                      });
-                    }
-                  },
-                  child: const Icon(Icons.edit))
-            ],
-          ),
-          onSubmitTap: () {},
-          onCancelTap: null,
-          submitText: 'Back',
-          cancelText: '')),
+      onLongPress: () => _showDeleteContactDialog(contact),
+      onTap: (() => _showContactInfoDialog(contact)),
       child: Card(
         elevation: 5.0,
         margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
@@ -391,23 +408,23 @@ class _ContactsPageState extends State<ContactsPage> {
     prefs.setString('myInfo', _myInfoStr);
   }
 
+  /// Saves user's selected theme to local storage.
+  void _saveTheme(int colorValue) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('themeColor', colorValue);
+  }
+
   /// Fetches user's stored theme and applies it.
   void _setSavedTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var theme = prefs.getString('theme');
-    if (theme == 'pink') {
-      ColorsPlus.setSecondaryColor = Colors.pink[300]!;
+    int? themeColor = prefs.getInt('themeColor');
+    if (themeColor != null) {
+      ColorsPlus.setSecondaryColor = Color(themeColor);
     } else {
       ColorsPlus.setSecondaryColor = const Color(0xff53a99a);
     }
   }
-
-  /// Saves user's selected theme to local storage.
-  void _saveTheme(String theme) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('theme', theme);
-  }
-
+  
   /// Allows the user to pick and save an image from gallery to be used as their
   /// profile picture.
   Future _setProfilePic() async {
@@ -519,18 +536,7 @@ class _ContactsPageState extends State<ContactsPage> {
                       floating: true,
                       leading: InkWell(
                           onTap: () {
-                            isThemeChanged = !isThemeChanged;
-                            if (isThemeChanged) {
-                              setState(() => ColorsPlus.setSecondaryColor =
-                                  Colors.pink[300]!);
-                              _saveTheme('pink');
-                            } else {
-                              setState(() => ColorsPlus.setSecondaryColor =
-                                  const Color(0xff53a99a));
-                              _saveTheme('blue');
-                            }
-
-                            FocusManager.instance.primaryFocus?.unfocus();
+                            _showColorPickerDialog();
                           },
                           child: const Icon(Icons.contacts)),
                       title: TextField(
