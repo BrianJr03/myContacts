@@ -57,11 +57,8 @@ class _ContactsPageState extends State<ContactsPage> {
   /// Indicates the visibility of dialerPad.
   bool _isDialerShown = false;
 
-  /// Indicates if the user has toggled their theme.
-  bool isThemeChanged = false;
-
   /// Indicates if the FAB is visible.
-  bool isFabVisible = true;
+  bool _isFabVisible = true;
 
   @override
   void initState() {
@@ -178,7 +175,7 @@ class _ContactsPageState extends State<ContactsPage> {
         cancelText: "Cancel");
   }
 
-  /// Shows Update Info dialog, allowing a user to delete a selected
+  /// Shows Delete Contact dialog, allowing a user to delete a selected
   /// contact.
   void _showDeleteContactDialog(Contact contact) {
     DialogPlus.showDialogPlus(
@@ -506,7 +503,7 @@ class _ContactsPageState extends State<ContactsPage> {
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
-            floatingActionButton: isFabVisible
+            floatingActionButton: _isFabVisible
                 ? FloatingActionButton(
                     onPressed: () async {
                       await FlutterContacts.openExternalInsert();
@@ -522,9 +519,9 @@ class _ContactsPageState extends State<ContactsPage> {
             body: NotificationListener<UserScrollNotification>(
               onNotification: (n) {
                 if (n.direction == ScrollDirection.forward) {
-                  if (!isFabVisible) setState(() => isFabVisible = true);
+                  if (!_isFabVisible) setState(() => _isFabVisible = true);
                 } else if (n.direction == ScrollDirection.reverse) {
-                  if (isFabVisible) setState(() => isFabVisible = false);
+                  if (_isFabVisible) setState(() => _isFabVisible = false);
                 }
                 return true;
               },
