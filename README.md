@@ -7,6 +7,8 @@ A simple contacts app, built with Flutter.
 
 ## Features
 
+- ### Create, Update, and Delete contacts.
+
 - ### Search Functionality
   - A user can filter through their contacts via `name` or `number` with the help of a search bar.
   
